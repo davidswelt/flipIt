@@ -38,7 +38,7 @@
 			var forceNewSession = $.url(url).param('forceNewSession');
 
 			if(!session_id == null || forceNewSession) {
-				 session_id = $.ajax({type:'GET', url:'postResult.php', data:{action:'startGameSession','mturk_id':mturk_id}, async:false}).responseText;
+				 session_id = $.ajax({type:'GET', url:'dbLayer.php', data:{action:'startGameSession','mturk_id':mturk_id}, async:false}).responseText;
 				 $.cookie('session_id', session_id);
 			}
 			return session_id;
@@ -111,6 +111,7 @@
 					 redScores.push(game.yScore);
 					 
 					 var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)}; 
+					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 					 alert(endMsg);
 					 endMsgDisplayed = 'Yes';
 				  }
@@ -125,7 +126,7 @@
 					  started = true;
 					  sb.update(0, 0);
 					  var myData = {action:'startGameRun','session_id':session_id};
-					  run_id = $.ajax({type:'GET', url:'postResult.php', data:myData, async:false}).responseText;
+					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 					  game.start( msPerTickSlow, numTicksLong );
 				}
         });
@@ -140,7 +141,7 @@
 				  redScores.push(game.yScore);
 				  
 				  var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)};
-				  $.ajax({type:'GET', url:'postResult.php', data:myData, async:false}).responseText;
+				  $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 			  }
 		  });
       });
