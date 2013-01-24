@@ -1,16 +1,72 @@
+<?php
+	if(!array_key_exists('mturk_id', $_GET)) {
+   	?>
+		<form target='_self' method='GET'>
+		What is you MTurk Id? <input name='mturk_id' id='mturk_id' type='text'>
+		<input type='submit' value='Submit'>
+		</form>
+		<?php
+		die;
+	}
+?>
 <html>
   <head>
     <meta http-equiv="X-UA-Compatible" content="chrome=1, IE=edge">
 
-    <link rel="stylesheet" type="text/css" href="css/style.css" /> 
+    <link rel="stylesheet" type="text/css" href="/flipIt/css/style.css" /> 
 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script type="text/javascript" src="https://raw.github.com/EthanHeilman/flipIt/master/js/flipit.js"></script>
-    <script type="text/javascript" src="https://raw.github.com/EthanHeilman/flipIt/master/js/drawflipit.js"></script>
+    <script type="text/javascript" src="/flipIt/js/flipit.js"></script>
+    <script type="text/javascript" src="/flipIt/js/drawflipit.js"></script>
+    <script type="text/javascript" src="/flipIt/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/flipIt/js/purl.js"></script>
 
     <!-- Start flipit.js once the document loads -->
     <script type="text/javascript">
-      $(document).ready(function(){
+	 	function testCookie() {
+			testCookie.enabled = false;
+			$.cookie('testCookie','1');
+			var test = $.cookie('testCookie');
+			if(test) {
+         	testCookie.enabled = true;
+			}
+		}      
+
+		function getOrCreateSession(mturk_id) {
+			var session_id = $.cookie('session_id');
+			var url = location.toString();
+			var forceNewSession = $.url(url).param('forceNewSession');
+
+			if(!session_id == null || forceNewSession) {
+				 session_id = $.ajax({type:'GET', url:'postResult.php', data:{action:'startGameSession','mturk_id':mturk_id}, async:false}).responseText;
+				 $.cookie('session_id', session_id);
+			}
+			return session_id;
+		}
+
+	 	function getCleanFlipString(dirty) {
+			clean = [];
+
+         for(var i=0;i<dirty.length;i++) {
+         	if(dirty[i] != null) {
+					clean.push(i+":"+dirty[i]);
+				}
+			}
+
+			return clean.join(",");
+		}
+
+		$(document).ready(function() {
+			var url = location.toString();
+			var mturk_id = $.url(url).param('mturk_id');
+			testCookie();
+			if(!testCookie.enabled) {
+				document.write("Please enable cookies to perform this task.");
+				return;
+			}
+			var session_id = getOrCreateSession(mturk_id);
+			console.log("session_id:"+session_id);
+
        
         var msPerTickSlow = 10;
         var numTicksLong = 2000;
@@ -22,23 +78,71 @@
 
         var gDraw = new FlipItRenderEngine( config );
         var sb = new ScoreBoard( $("#scoreBoard"), config.xColor, config.yColor );        
+
         var game = new FlipItGame( gDraw, 
           Players["humanPlayer"], Players["randomPlayer"], sb.update );
 
         game.newGame();
         sb.update(0, 0);
-        
+		  var run_id = null;
+		  var started = false;
+		  var blueScores = [];
+		  var redScores = [];
+		  var endMsgDisplayed = 'N/A';
+
+		  setInterval(function() {
+			  if(game.running) {
+               $('#startBtn').attr('disabled','disabled')
+					endMsgDisplayed = 'No';
+			  }
+			  else {
+				  if(endMsgDisplayed == 'No') {
+					 if(game.xScore - game.yScore > 0) {
+						 endMsg = "Good job! You won!";
+					 }
+					 else {
+						 endMsg = "You lost! Better luck next time!";
+					 }
+					 $('#startBtn').html('Start next game')
+
+					 flips = getCleanFlipString(game.flips);
+
+					 blueScores.push(game.xScore);
+					 redScores.push(game.yScore);
+					 
+					 var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)}; 
+					 alert(endMsg);
+					 endMsgDisplayed = 'Yes';
+				  }
+
+				  $('#startBtn').removeAttr('disabled')
+			  }
+		  }, msPerTickSlow);
+
         //setup buttons
         $("#startBtn").click( function() {
-          sb.update(0, 0);
-          game.start( msPerTickSlow, numTicksLong );
+				  if(!game.running) {
+					  started = true;
+					  sb.update(0, 0);
+					  var myData = {action:'startGameRun','session_id':session_id};
+					  run_id = $.ajax({type:'GET', url:'postResult.php', data:myData, async:false}).responseText;
+					  game.start( msPerTickSlow, numTicksLong );
+				}
         });
 
-        $("#flipBtn").click( function() {
-          game.defenderFlip();
-          sb.update( game.xScore, game.yScore );
-        });
+		  $("#flipBtn").click( function() {
+			  if(game.running) {
+				  game.defenderFlip();
+				  flips = getCleanFlipString(game.flips);
+				  sb.update( game.xScore, game.yScore );
 
+				  blueScores.push(game.xScore);
+				  redScores.push(game.yScore);
+				  
+				  var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)};
+				  $.ajax({type:'GET', url:'postResult.php', data:myData, async:false}).responseText;
+			  }
+		  });
       });
     </script>
 
@@ -53,9 +157,10 @@
     <div id="scoreBoard"></div>
     
     <canvas id="gameBoard" width="800" height="150"><h1>Canvas element not supported by your browser. Use an HTML5 compatible browser like Chrome or Firefox.</h1></canvas>
+	 <br>
 
     <button id="startBtn">Start</button> to play as the blue player
-    <button id="flipBtn">Flip</button> to flip.
+    <br><button id="flipBtn">Flip</button> to flip.
 
     <br><br>
 
@@ -89,19 +194,19 @@
       <li>
         <h3>Points</h3>
         <p>
-        A player gains <b>100</b> points per second that that player is in control.
+        You gain <b>100</b> points per second that you are in control.
         <br>
-        A player loses <b>100</b> points when that player plays 'flip'.
+        You lose <b>100</b> points when you play 'flip'.
         </p>
       </li>
       
       <li>  
         <h3>Moves</h3>
         <p>
-        The only move available to either the red or the blue player is to play 'flip'.
+        Your only move is to play 'flip'
         If you are in control and you play 'flip' you remain in control.
         If you are not in control and you play 'flip' you regain control.
-        One on player can be in control at a time.
+        Only one player can be in control at a time.
         </p>
       </li>
     
@@ -118,7 +223,7 @@
         </p>
 
         An example game:
-        <iframe src="http://ethanheilman.github.com/flipIt/drawgame.html?flips=100:X,200:Y,900:X" width="850" height="200" frameborder="0"></iframe>
+        <iframe src="/flipIt/drawgame.html?flips=100:X,200:Y,900:X" width="850" height="200" frameborder="0"></iframe>
         <p>   
         Lets examine the moves made in the game given above.
         </p>
@@ -146,7 +251,7 @@
         The red player was in control for <b>7</b> seconds gaining <b>700</b> points, playing flip only once at a cost of <b>-100</b> points, for a total score of <b>600</b> points.
         </p>
         <p>
-        The red player having more points than the blue player wins.
+        The red player has more points than the blue player and thus wins.
         </p>
       </li>
     </ul>
@@ -157,15 +262,10 @@
   <p>
   FlipIt was invented by Marten van Dijk, Ari Juels, Alina Oprea, and Ronald L. Rivest in the paper <a href="http://www.rsa.com/rsalabs/presentations/Flipit.pdf">FLIPIT: The Game of "Stealthy Takeover"</a>.
   </p>
-  <p>
-  The game was developed to model <a href="http://en.wikipedia.org/wiki/Advanced_persistent_threat">Advanced Persistent Threats</a> or <a href="http://www.rsa.com/rsalabs/node.asp?id=3911">APTs</a> and other strategic games of limited information.
-  For example flipIt is very similar to the situations faced by <a href="http://en.wikipedia.org/wiki/Clandestine_HUMINT">spy agencies</a> and <a href="http://en.wikipedia.org/wiki/Guerrilla_warfare">insurgent networks</a> in which members of an network may have been flipped, double crossing the network. 
-  Such betrayals will remain unknown to the network until the network actively and at high cost either launches an investigation or flips an enemy agent to learn which friendly agents have been flipped.
-  </p>
 
   <p>
   This implementation of flipIt was written in javascript and HTML by <a href="http://github.com/EthanHeilman">Ethan Heilman</a>.
-  As of July 2012 this is the only computer implementation of the game.
+  This version was adapted by <a href='http://www.alannochenson.com'>Alan Nochenson.</a>
   For the source code and further documentation please visit <a href="https://github.com/EthanHeilman/flipIt">flipIt on github</a>.
   </p>
   </div>

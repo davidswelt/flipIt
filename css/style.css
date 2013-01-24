@@ -4,8 +4,10 @@ body{
   margin-right:100px;
   margin-left:100px;
   margin-bottom:200px;
+}
 
-  width:800px;
+body, div#rules_panel {
+	width:800px;
 }
 
 canvas{
