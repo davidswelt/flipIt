@@ -103,7 +103,6 @@
 					 else {
 						 endMsg = "You lost! Better luck next time!";
 					 }
-					 $('#startBtn').html('Start next game')
 
 					 flips = getCleanFlipString(game.flips);
 
@@ -114,6 +113,19 @@
 					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 					 alert(endMsg);
 					 endMsgDisplayed = 'Yes';
+
+					 var myData = {action:'getSessionStats','session_id':session_id}; 
+					 var session_stats = JSON.parse($.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText);
+					 var num_runs_remaining = session_stats['num_runs_remaining'];
+
+		  			 if(num_runs_remaining > 0) {
+						 $('#startBtn').html('Start next game');
+					 }
+					 else {
+                	$('body').hide();
+						alert('You have played enough today. The window will now be closed');
+						window.close();
+					 }
 				  }
 
 				  $('#startBtn').removeAttr('disabled')

@@ -23,10 +23,32 @@ function init() {
 		$run_id = $_GET['run_id'] or die("No run_id provided!");
    	postFlip($db, $run_id);
 	}
+
+	if($action == 'getSessionStats') {
+		$session_id = $_GET['session_id'] or die("No session_id provided!");
+		getSessionStats($db, $session_id);
+
+	}
 }
 
-function getSessionId($db, $mturk_id) {
-	//this should really get his cookie, not just the most recent one
+function getSessionStats($db, $session_id) {
+	$stats = array();
+	
+	$q = "SELECT count(id) FROM gameRun WHERE session_id=$session_id";
+	$data = runQuery($db, $q);
+	$count = $data[0]['count(id)'];
+
+	$q = "SELECT count(id) FROM gameRun WHERE session_id=$session_id";
+	$data = runQuery($db, $q);
+	$count = $data[0]['count(id)'];
+
+	$stats['num_runs'] = intval($count);
+	$stats['session_id'] = intval($session_id);
+	$stats['num_runs_remaining'] = MAX_RUNS_PER_SESSION - $count;
+	logMsg(json_encode($stats));
+}
+
+function getMostRecentSessionId($db, $mturk_id) {
 	$q = "SELECT id FROM gameSession WHERE mturk_id='$mturk_id' ORDER BY started DESC LIMIT 1";
 	$data = runQuery($db, $q);
 	$id = $data[0]['id'];
@@ -57,7 +79,7 @@ function sanitizeParams() {
 function startGameSession($db, $mturk_id) {
 	$q = "INSERT INTO gameSession (mturk_id, started) VALUES ('$mturk_id', now())";
 	runQuery($db, $q, false);
-	$session_id = getSessionId($db, $mturk_id);
+	$session_id = getMostRecentSessionId($db, $mturk_id);
 
 	logMsg($session_id);
 }
@@ -98,7 +120,7 @@ function logMsg($msg) {
 }
 
 function readAction() {
-	$goodAction = array('startGameSession', 'startGameRun', 'postFlip');
+	$goodAction = array('getSessionStats', 'startGameSession', 'startGameRun', 'postFlip');
 	$action = $_GET['action'];
 	if(!in_array($action, $goodAction)) {
    	die("Invalid action!");
