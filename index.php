@@ -1,8 +1,18 @@
 <?php
 	if(!array_key_exists('mturk_id', $_GET)) {
-   	?>
-		<form target='_self' method='GET'>
-		What is you MTurk Id? <input name='mturk_id' id='mturk_id' type='text'>
+		echo "<form target='_self' method='GET'>\n";
+
+		$id = 'MTurk Id';
+		if(array_key_exists('lab', $_GET)) {
+			$id = 'name';
+
+			echo "<input type='hidden' id='lab' name='lab' value='lab'>\n";
+		}
+		
+		echo "What is your $id?\n"; 
+		
+		?>
+		<input name='mturk_id' id='mturk_id' type='text'>
 		<input type='submit' value='Submit'>
 		</form>
 		<?php
@@ -152,8 +162,9 @@
 				  blueScores.push(game.xScore);
 				  redScores.push(game.yScore);
 				  
-				  var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)};
-				  $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
+				  //For now, don't post on every flip, to be more efficient
+				  //var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)};
+				  //$.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 			  }
 		  });
       });

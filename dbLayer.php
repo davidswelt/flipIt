@@ -6,28 +6,41 @@ function init() {
 	sanitizeParams();
    
 	$db = db_connect();
-	$action = readAction();
+	$action = $_GET['action'];
 
-	if($action == 'startGameSession') {
-		$mturk_id = $_GET['mturk_id'] or die("No mturk_id provided!");
-   	startGameSession($db, $mturk_id);
+	switch($action) {
+		case 'startGameSession':
+			checkGetKeyPresent('mturk_id');
+			startGameSession($db, $mturk_id);
+		break;
+
+		case 'startGameRun':
+			checkGetKeyPresent('session_id');
+			startGameRun($db, $session_id);
+		break;
+
+		case 'postFlip':
+			checkGetKeyPresent('run_id');
+			postFlip($db, $run_id);
+		break;
+
+		case 'getSessionStats':
+			checkGetKeyPresent('session_id');
+			getSessionStats($db, $session_id);
+		break;
+
+		case '':
+			logMessageAndDie("No action provided!");
+
+		default:
+			logMessageAndDie("Invalid action!");
+
 	}
+}
 
-	if($action == 'startGameRun') {
-		$session_id = $_GET['session_id'] or die("No session_id provided!");
-		startGameRun($db, $session_id);
-
-	}
-
-	if($action == 'postFlip') {
-		$run_id = $_GET['run_id'] or die("No run_id provided!");
-   	postFlip($db, $run_id);
-	}
-
-	if($action == 'getSessionStats') {
-		$session_id = $_GET['session_id'] or die("No session_id provided!");
-		getSessionStats($db, $session_id);
-
+function checkGetKeyPresent($key) {
+	if(!array_key_exists($key, $_GET) || !$_GET[$key]) {
+   	logMessageAndDie("No $key provided!");
 	}
 }
 
@@ -45,7 +58,7 @@ function getSessionStats($db, $session_id) {
 	$stats['num_runs'] = intval($count);
 	$stats['session_id'] = intval($session_id);
 	$stats['num_runs_remaining'] = MAX_RUNS_PER_SESSION - $count;
-	logMsg(json_encode($stats));
+	logMessageAndDie(json_encode($stats));
 }
 
 function getMostRecentSessionId($db, $mturk_id) {
@@ -65,13 +78,16 @@ function getRunId($db, $session_id) {
 
 function sanitizeParams() {
 	$ints = array('session_id', 'run_id'); 
+   $alphanums = array('mturk_id', 'action');
+
 	foreach($GET as $k=>$v) {
    	$_GET[$k] = htmlentities($v, ENT_QUOTES);
 		if(in_array($k, $ints)) {
 			$_GET[$k] = intval($v);
 		}
-		if($k == 'mturk_id') {
-			$id = preg_replace('/[^a-zA-Z0-9]/','', $id);
+
+		if(in_array($k, $alphanums)) {
+			$id = preg_replace('/[^a-zA-Z0-9 \s]/','', $id);
 		}
 	}
 }
@@ -81,7 +97,7 @@ function startGameSession($db, $mturk_id) {
 	runQuery($db, $q, false);
 	$session_id = getMostRecentSessionId($db, $mturk_id);
 
-	logMsg($session_id);
+	logMessageAndDie($session_id);
 }
 
 function startGameRun($db, $session_id) {
@@ -89,7 +105,7 @@ function startGameRun($db, $session_id) {
 	runQuery($db, $q, false);
 	$game_id = getRunId($db, $session_id);
 
-	logMsg($game_id);
+	logMessageAndDie($game_id);
 }
 
 function postFlip($db, $run_id) {
@@ -111,21 +127,12 @@ function postFlip($db, $run_id) {
 	$q = "INSERT INTO gameResult (run_id, flips, blue_score, red_score, updated) VALUES ($run_id, '$flips', '$bs', '$rs', now())";
 
 	runQuery($db, $q, false);
-	logMsg("Inserted a flip row with bs=$bs, rs=$rs");
+	logMessageAndDie("Inserted a flip row with bs=$bs, rs=$rs");
 }
 
-function logMsg($msg) {
+function logMessageAndDie($msg) {
 	die("$msg");
 
-}
-
-function readAction() {
-	$goodAction = array('getSessionStats', 'startGameSession', 'startGameRun', 'postFlip');
-	$action = $_GET['action'];
-	if(!in_array($action, $goodAction)) {
-   	die("Invalid action!");
-	}
-	return $action;
 }
 
 function db_connect() {
