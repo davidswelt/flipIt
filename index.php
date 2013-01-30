@@ -1,28 +1,54 @@
-<?php
-	if(!array_key_exists('mturk_id', $_GET)) {
-		echo "<form target='_self' method='GET'>\n";
-
-		$id = 'MTurk Id';
-		if(array_key_exists('lab', $_GET)) {
-			$id = 'name';
-
-			echo "<input type='hidden' id='lab' name='lab' value='lab'>\n";
-		}
-		
-		echo "What is your $id?\n"; 
-		
-		?>
-		<input name='mturk_id' id='mturk_id' type='text'>
-		<input type='submit' value='Submit'>
-		</form>
-		<?php
-		die;
-	}
-?>
 <html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1, IE=edge">
+	<style>
+	body {
+		position: absolute;
+		left: 20%;
+		top: 20%;
+		padding-right:40%;
+		margin: auto
+	}
+	ul, ol, li { 
+		margin-top: 10px; 
+	}
+	</style>
+ 
+<?php
+	if(!array_key_exists('mturk_id', $_GET) || !$_GET['mturk_id']) {
 
+		if(!array_key_exists('prevPage', $_GET)) {
+			displayConsent();
+		}
+		elseif($_GET['prevPage'] == 'consentForm') {
+			echo '</head><body>';
+			displayInstructions();
+		}
+		elseif($_GET['prevPage'] == 'instructions') {
+			displaySurvey();
+		}
+		elseif($_GET['prevPage'] == 'survey') {
+      	processSurvey();
+		}
+	}
+
+	function displayConsent() {
+		include('consentForm.php');
+		die;
+	}
+
+	function displayInstructions() {
+   	include('instructions.php');
+		die;
+	}
+	function displaySurvey() {
+   	include('survey.php');
+		die;
+	}
+	function processSurvey() {
+		//survey info entered into db here
+
+	}
+?>
     <link rel="stylesheet" type="text/css" href="/flipIt/css/style.css" /> 
 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
@@ -47,7 +73,7 @@
 			var url = location.toString();
 			var forceNewSession = $.url(url).param('forceNewSession');
 
-			if(!session_id == null || forceNewSession) {
+			if(!session_id || forceNewSession) {
 				 session_id = $.ajax({type:'GET', url:'dbLayer.php', data:{action:'startGameSession','mturk_id':mturk_id}, async:false}).responseText;
 				 $.cookie('session_id', session_id);
 			}
@@ -75,8 +101,6 @@
 				return;
 			}
 			var session_id = getOrCreateSession(mturk_id);
-			console.log("session_id:"+session_id);
-
        
         var msPerTickSlow = 10;
         var numTicksLong = 2000;
@@ -121,15 +145,22 @@
 					 
 					 var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)}; 
 					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
-					 alert(endMsg);
+					  $('#flash').hide();
+					 $('#flash').fadeToggle('fast','linear');
+					 $('#flash').html(endMsg);
+					 //$('#flash').fadeToggle('slow','linear');
+					 //$('#flash').html('');
 					 endMsgDisplayed = 'Yes';
 
 					 var myData = {action:'getSessionStats','session_id':session_id}; 
-					 var session_stats = JSON.parse($.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText);
+					 var session_stats = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false});
+					 session_stats = JSON.parse(session_stats.responseText);
 					 var num_runs_remaining = session_stats['num_runs_remaining'];
+					 var num_runs_played = session_stats['num_runs_played'];
 
 		  			 if(num_runs_remaining > 0) {
 						 $('#startBtn').html('Start next game');
+						 $('#statsBox').html(' ('+num_runs_remaining+' runs left, '+num_runs_played+' runs played)');
 					 }
 					 else {
                 	$('body').hide();
@@ -163,125 +194,55 @@
 				  redScores.push(game.yScore);
 				  
 				  //For now, don't post on every flip, to be more efficient
-				  //var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)};
-				  //$.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
+				  var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)};
+				  $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 			  }
 		  });
       });
     </script>
 
+	 <style>
+	 div#flash {
+    	background: gray;
+		border: 1px solid black;
+		padding: 3px 3px 3px 3px;
+	 }
+
+	 </style>
   </head>
 
   <title>FlipIt - The Game of Stealthy Takeover</title>
   <body>
+	 <div id='not_rules_panel'>
     <div id="top_panel">
       <h1 id="title">FlipIt - The Game of Stealthy Takeover</h1>
     </div>
+	  <div id='flash' style='display:none'></div>
 
     <div id="scoreBoard"></div>
     
-    <canvas id="gameBoard" width="800" height="150"><h1>Canvas element not supported by your browser. Use an HTML5 compatible browser like Chrome or Firefox.</h1></canvas>
+    <canvas id="gameBoard" width="800" height="150"><h1>Canvas element not supported by your browser. Please use an HTML5 compatible browser like Chrome or Firefox.</h1></canvas>
 	 <br>
 
-    <button id="startBtn">Start</button> to play as the blue player
+    <button id="startBtn">Start</button> to play as the blue player<span id='statsBox'></span>
     <br><button id="flipBtn">Flip</button> to flip.
 
     <br><br>
 
-    <p>Click start to start the game. You are playing the blue player. The board will appear grey until you flip to learn the state of the board.</p>
+	 <button onclick='$("#rules_panel").fadeToggle("fast","linear")'>Show/hide rules</button>
+	 </div>
 
-  <div id="rules_panel">
+	 <?php include('instructions.php') ?>
+	 <script>
+	 $('#rules_panel').hide();
+	 $('#instructions_confirm_form').hide();
 
-    <h2>Rules</h2>
-    <ul>
-      
-      <li>
-        <h3>Basic</h3>
-        <p>
-        You are playing as the blue player.
-        While you, the blue player, always start in control the red player can play a flip and gain control at any time.
-        The state of the board is obscured in grey.
-        You and the red player only learn the state of the game by playing 'flip'.
-        You can gain control by playing flip.
-        The game ends after 10 seconds.
-        </p>
-      </li>
-    
-      <li>
-        <h3>How to Win</h3>
-        <p>
-        The object of the game is to win as many points as possible.
-        To win you want to be in control for as long as possible using as few flips as possible.
-        </p>
-      </li>
-      
-      <li>
-        <h3>Points</h3>
-        <p>
-        You gain <b>100</b> points per second that you are in control.
-        <br>
-        You lose <b>100</b> points when you play 'flip'.
-        </p>
-      </li>
-      
-      <li>  
-        <h3>Moves</h3>
-        <p>
-        Your only move is to play 'flip'
-        If you are in control and you play 'flip' you remain in control.
-        If you are not in control and you play 'flip' you regain control.
-        Only one player can be in control at a time.
-        </p>
-      </li>
-    
-      <li>
-        <h3>The Board</h3>
-        <p>
-        The board displays the current known information about the game.
-        Each 'flip' played is marked with a circle.
-        You can only see information that was revealed by your flips.
-        The scores are updated when you play a 'flip' and reveal the current state of the game.
-        Blue rectangles represent periods of time in which you, the blue player, had control. 
-        Red rectangles represent periods of time in which the red player was in control.
-        The score is given in the upper left hand corner.
-        </p>
+	 </script>
 
-        An example game:
-        <iframe src="/flipIt/drawgame.html?flips=100:X,200:Y,900:X" width="850" height="200" frameborder="0"></iframe>
-        <p>   
-        Lets examine the moves made in the game given above.
-        </p>
-        <ul>
-          <li>
-            0 second: The blue player starts in control.
-          </li>
-          <li>
-            1 second: the blue player plays 'flip' and reminds in control.
-          </li>
-          <li> 
-            2 seconds: the red player plays 'flip' and seizes control. The red player reminds in control for 7 seconds.
-          </li>
-          <li>
-            9 seconds: the blue player plays 'flip' and takes control back. 
-          </li>
-          <li>
-            10 seconds: the game ends.
-          </li>
-        </ul>
-        <p> 
-        The blue player was in control for <b>2 + 1 = 3</b> seconds gaining <b>300</b> points, playing flip twice costed the blue player <b>2 * -100 = -200</b> points, for a total score of <b>100</b> points.
-        </p>
-        <p>
-        The red player was in control for <b>7</b> seconds gaining <b>700</b> points, playing flip only once at a cost of <b>-100</b> points, for a total score of <b>600</b> points.
-        </p>
-        <p>
-        The red player has more points than the blue player and thus wins.
-        </p>
-      </li>
-    </ul>
-  </div>
 
-  <div id="about_panel">
+
+
+  <div id="about_panel" style='display:none'>
   <h2>About The Game</h2>
   <p>
   FlipIt was invented by Marten van Dijk, Ari Juels, Alina Oprea, and Ronald L. Rivest in the paper <a href="http://www.rsa.com/rsalabs/presentations/Flipit.pdf">FLIPIT: The Game of "Stealthy Takeover"</a>.

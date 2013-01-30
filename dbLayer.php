@@ -10,23 +10,19 @@ function init() {
 
 	switch($action) {
 		case 'startGameSession':
-			checkGetKeyPresent('mturk_id');
-			startGameSession($db, $mturk_id);
+			startGameSession($db, getKeyIfPresent('mturk_id'));
 		break;
 
 		case 'startGameRun':
-			checkGetKeyPresent('session_id');
-			startGameRun($db, $session_id);
+			startGameRun($db, getKeyIfPresent('session_id'));
 		break;
 
 		case 'postFlip':
-			checkGetKeyPresent('run_id');
-			postFlip($db, $run_id);
+			postFlip($db, getKeyIfPresent('run_id'));
 		break;
 
 		case 'getSessionStats':
-			checkGetKeyPresent('session_id');
-			getSessionStats($db, $session_id);
+			getSessionStats($db, getKeyIfPresent('session_id'));
 		break;
 
 		case '':
@@ -38,9 +34,12 @@ function init() {
 	}
 }
 
-function checkGetKeyPresent($key) {
+function getKeyIfPresent($key) {
 	if(!array_key_exists($key, $_GET) || !$_GET[$key]) {
    	logMessageAndDie("No $key provided!");
+	}
+	else {
+   	return $_GET[$key];
 	}
 }
 
@@ -51,11 +50,8 @@ function getSessionStats($db, $session_id) {
 	$data = runQuery($db, $q);
 	$count = $data[0]['count(id)'];
 
-	$q = "SELECT count(id) FROM gameRun WHERE session_id=$session_id";
-	$data = runQuery($db, $q);
-	$count = $data[0]['count(id)'];
-
-	$stats['num_runs'] = intval($count);
+	$stats['num_runs_played'] = intval($count);
+	
 	$stats['session_id'] = intval($session_id);
 	$stats['num_runs_remaining'] = MAX_RUNS_PER_SESSION - $count;
 	logMessageAndDie(json_encode($stats));
@@ -69,7 +65,6 @@ function getMostRecentSessionId($db, $mturk_id) {
 }
 
 function getRunId($db, $session_id) {
-	//this should really get his cookie, not just the most recent one
 	$q = "SELECT id FROM gameRun WHERE session_id='$session_id' ORDER BY started DESC LIMIT 1";
 	$data = runQuery($db, $q);
 	$id = $data[0]['id'];
