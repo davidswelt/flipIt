@@ -146,10 +146,10 @@
 					 var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)}; 
 					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 					  $('#flash').hide();
-					 $('#flash').fadeToggle('fast','linear');
+					 $('#flash').fadeIn('fast','linear');
 					 $('#flash').html(endMsg);
-					 //$('#flash').fadeToggle('slow','linear');
-					 //$('#flash').html('');
+					 $('#flash').css('text-align','center');
+					 $('#flash').fadeOut(6000,'linear');
 					 endMsgDisplayed = 'Yes';
 
 					 var myData = {action:'getSessionStats','session_id':session_id}; 
@@ -203,7 +203,7 @@
 
 	 <style>
 	 div#flash {
-    	background: gray;
+   	background: #6d7b8d;
 		border: 1px solid black;
 		padding: 3px 3px 3px 3px;
 	 }
