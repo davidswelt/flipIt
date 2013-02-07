@@ -6,7 +6,7 @@ function init() {
 	sanitizeParams();
    
 	$db = db_connect();
-	$action = $_GET['action'];
+	$action = $_REQUEST['action'];
 
 	switch($action) {
 		case 'startGameSession':
@@ -31,15 +31,17 @@ function init() {
 		default:
 			logMessageAndDie("Invalid action!");
 
+		case 'connect':
+
 	}
 }
 
 function getKeyIfPresent($key) {
-	if(!array_key_exists($key, $_GET) || !$_GET[$key]) {
+	if(!array_key_exists($key, $_REQUEST) || !$_REQUEST[$key]) {
    	logMessageAndDie("No $key provided!");
 	}
 	else {
-   	return $_GET[$key];
+   	return $_REQUEST[$key];
 	}
 }
 
@@ -71,28 +73,42 @@ function getRunId($db, $session_id) {
 	return intval($id);
 }
 
-function sanitizeParams() {
+function sanitizeParams($allInts = false) {
 	$ints = array('session_id', 'run_id'); 
    $alphanums = array('mturk_id', 'action');
 
-	foreach($GET as $k=>$v) {
-   	$_GET[$k] = htmlentities($v, ENT_QUOTES);
+	foreach($_REQUEST as $k=>$v) {
+   	$_REQUEST[$k] = htmlentities($v, ENT_QUOTES);
+
+      if($allInts) {
+			if(is_array($allInts)) {
+				if(!in_array($k, $allInts)) {
+					$_REQUEST[$k] = intval($v);
+				}
+			}
+			else {
+				$id = preg_replace('/[^a-zA-Z0-9 \s]/','', $id);
+			}
+		}
+
 		if(in_array($k, $ints)) {
-			$_GET[$k] = intval($v);
+			$_REQUEST[$k] = intval($v);
 		}
 
 		if(in_array($k, $alphanums)) {
-			$id = preg_replace('/[^a-zA-Z0-9 \s]/','', $id);
+			$REQUEST[$k] = preg_replace('/[^a-zA-Z0-9 \s]/','', $_REQUEST[$k]);
 		}
 	}
 }
 
-function startGameSession($db, $mturk_id) {
-	$q = "INSERT INTO gameSession (mturk_id, started) VALUES ('$mturk_id', now())";
+function startGameSession($db, $mturk_id, $survey_blob, $die = true) {
+	$q = "INSERT INTO gameSession (mturk_id, started, survey_blob) VALUES ('$mturk_id', now(), '$survey_blob')";
 	runQuery($db, $q, false);
 	$session_id = getMostRecentSessionId($db, $mturk_id);
 
-	logMessageAndDie($session_id);
+	if($die) {
+		logMessageAndDie($session_id);
+	}
 }
 
 function startGameRun($db, $session_id) {
@@ -107,14 +123,14 @@ function postFlip($db, $run_id) {
 	$bs = 0;
 	$rs = 0;                  
 	$flips = 'Invalid';
-	if(array_key_exists('bs', $_GET)) {
-		$bs = $_GET['bs'];
+	if(array_key_exists('bs', $_REQUEST)) {
+		$bs = $_REQUEST['bs'];
 	}
-	if(array_key_exists('rs', $_GET)) {
-		$rs = $_GET['rs'];
+	if(array_key_exists('rs', $_REQUEST)) {
+		$rs = $_REQUEST['rs'];
 	}
-	if(array_key_exists('flips', $_GET)) {
-		$flips = $_GET['flips'];
+	if(array_key_exists('flips', $_REQUEST)) {
+		$flips = $_REQUEST['flips'];
 	}
 	$q = "DELETE FROM gameResult WHERE run_id = $run_id";
 	runQuery($db, $q, false);

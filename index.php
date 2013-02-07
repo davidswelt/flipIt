@@ -14,21 +14,19 @@
 	</style>
  
 <?php
-	if(!array_key_exists('mturk_id', $_GET) || !$_GET['mturk_id']) {
 
-		if(!array_key_exists('prevPage', $_GET)) {
-			displayConsent();
-		}
-		elseif($_GET['prevPage'] == 'consentForm') {
-			echo '</head><body>';
-			displayInstructions();
-		}
-		elseif($_GET['prevPage'] == 'instructions') {
-			displaySurvey();
-		}
-		elseif($_GET['prevPage'] == 'survey') {
-      	processSurvey();
-		}
+	if(!array_key_exists('prevPage', $_REQUEST)) {
+		displayConsent();
+	}
+	elseif($_REQUEST['prevPage'] == 'consentForm') {
+		echo '</head><body>';
+		displayInstructions();
+	}
+	elseif($_REQUEST['prevPage'] == 'instructions') {
+		displaySurvey();
+	}
+	elseif($_REQUEST['prevPage'] == 'survey') {
+		processSurvey();
 	}
 
 	function displayConsent() {
@@ -41,12 +39,63 @@
 		die;
 	}
 	function displaySurvey() {
-   	include('survey.php');
+   	include('survey/survey.php');
 		die;
 	}
 	function processSurvey() {
-		//survey info entered into db here
+		$_REQUEST['action'] = 'connect';
+		require_once(dirname(__FILE__).'/dbLayer.php');
+		unset($_REQUEST['action']);
+		unset($_REQUEST['prevPage']);
 
+		sanitizeParams(array('mturk_id','forceNewSession', 'prevPage','action'));
+		collapseScale('rps', 9);
+		collapseScale('nfc', 9);
+		ksort($_REQUEST);
+		$survey_blob = json_encode($_REQUEST);
+
+		//get treatment stuff here
+		//save it and use it later
+		createNewSession($survey_blob);
+
+		//survey info entered into db here
+	}
+	
+	function createNewSession($survey_blob) {
+		if(array_key_exists('forceNewSession', $_REQUEST)) {
+			$db = db_connect();
+			$session_id = startGameSession($db, $mturk_id, $survey_blob, false);
+			setcookie('session_id', $session_id);
+		}
+	}
+
+	//this function should be moved somewhere better. too lazy...
+	function collapseScale($type, $size) {
+		if($type == 'rps' || $type == 'nfc') {
+			
+			if($type == 'rps') {
+				$rev = array(1, 2, 3, 5);
+			}
+			else {
+         	$rev = array(1, 3, 4, 5);
+			}
+
+			$rpstotal = 0;
+
+      	foreach($_REQUEST as $k => $v) {
+				if(preg_match('/^'.$type.'(\d)$/', $k, $matches)) {
+					$rpsnum = intval($matches[1]);
+					
+					if(in_array($rpsnum, $rev)) {
+               	$v = $size+1-$v;
+					}
+
+               $rpstotal += $v;
+					unset($_REQUEST[$k]);
+				}
+			}
+			$_REQUEST[$type.'total'] = $rpstotal;
+		}
 	}
 ?>
     <link rel="stylesheet" type="text/css" href="/flipIt/css/style.css" /> 
@@ -68,15 +117,9 @@
 			}
 		}      
 
-		function getOrCreateSession(mturk_id) {
+		function getSession(mturk_id) {
 			var session_id = $.cookie('session_id');
-			var url = location.toString();
-			var forceNewSession = $.url(url).param('forceNewSession');
 
-			if(!session_id || forceNewSession) {
-				 session_id = $.ajax({type:'GET', url:'dbLayer.php', data:{action:'startGameSession','mturk_id':mturk_id}, async:false}).responseText;
-				 $.cookie('session_id', session_id);
-			}
 			return session_id;
 		}
 
@@ -100,7 +143,7 @@
 				document.write("Please enable cookies to perform this task.");
 				return;
 			}
-			var session_id = getOrCreateSession(mturk_id);
+			var session_id = getSession(mturk_id);
        
         var msPerTickSlow = 10;
         var numTicksLong = 2000;
@@ -193,7 +236,6 @@
 				  blueScores.push(game.xScore);
 				  redScores.push(game.yScore);
 				  
-				  //For now, don't post on every flip, to be more efficient
 				  var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)};
 				  $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 			  }
