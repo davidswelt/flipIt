@@ -1,4 +1,4 @@
-<div id="rules_panel" style='postion:relative;float:right'>
+<div id="rules_panel">
  <p>You are playing a game called flipIt. You will play multiple rounds of this game. You must play all rounds. Click start to start the game. You are the blue player. The board will appear grey until you flip to learn the state of the board.</p>
 
  <h2>Rules</h2>

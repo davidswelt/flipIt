@@ -3,9 +3,9 @@
 	<style>
 	body {
 		position: absolute;
-		left: 20%;
-		top: 20%;
-		padding-right:40%;
+		left:30px;
+		top:30px;
+		max-width:800px;
 		margin: auto
 	}
 	ul, ol, li { 
@@ -16,6 +16,7 @@
 <?php
 
 	if(!array_key_exists('prevPage', $_REQUEST)) {
+		echo '</head><body>';
 		displayConsent();
 	}
 	elseif($_REQUEST['prevPage'] == 'consentForm') {
@@ -27,7 +28,6 @@
 	}
 	elseif($_REQUEST['prevPage'] == 'survey') {
 		processSurveyAndCreateSession();
-
 	}
 
 	function displayConsent() {
@@ -195,8 +195,9 @@
 					 
 					 var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)}; 
 					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
-					  $('#flash').hide();
-					 $('#flash').fadeIn('fast','linear');
+					  //$('#flash').hide();
+						$('#flash').css('visibility', 'visible');
+					 //$('#flash').fadeIn('fast','linear');
 					 $('#flash').html(endMsg);
 					 $('#flash').css('text-align','center');
 					 //$('#flash').fadeOut(6000,'linear');
@@ -214,7 +215,8 @@
 					 }
 					 else {
                 	$('body').hide();
-						alert('You have played enough today. The window will now be closed');
+						alert('You have played enough today. The window will now be closed.');
+						window.open('', '_self', '');
 						window.close();
 					 }
 				  }
@@ -230,6 +232,8 @@
 					  sb.update(0, 0);
 					  var myData = {action:'startGameRun','session_id':session_id};
 					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
+
+						$('#flash').css('visibility', 'hidden');
 
 					  game.start( msPerTickSlow, numTicksLong );
 				}
@@ -294,7 +298,7 @@
     <div id="top_panel">
       <h1 id="title">FlipIt - The Game of Stealthy Takeover</h1>
     </div>
-	  <div id='flash' style='display:none'></div>
+	  <div id='flash' style='visibility:hidden'></div>
 
     <div id="scoreBoard"></div>
     
@@ -313,6 +317,11 @@
 	 ?>
 	 </p>
 
+
+	<script>
+	$('#rules_panel').css('position', 'relative');
+	$('#rules_panel').css('float', 'right');
+	</script>
 
 	 <button onclick='$("#rules_panel").fadeToggle("fast","linear")'>Show/hide rules</button>
 	 </div>
