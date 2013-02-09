@@ -26,7 +26,8 @@
 		displaySurvey();
 	}
 	elseif($_REQUEST['prevPage'] == 'survey') {
-		processSurvey();
+		processSurveyAndCreateSession();
+
 	}
 
 	function displayConsent() {
@@ -42,7 +43,7 @@
    	include('survey/survey.php');
 		die;
 	}
-	function processSurvey() {
+	function processSurveyAndCreateSession() {  
 		$_REQUEST['action'] = 'connect';
 		require_once(dirname(__FILE__).'/dbLayer.php');
 		unset($_REQUEST['action']);
@@ -56,16 +57,20 @@
 
 		//get treatment stuff here
 		//save it and use it later
-		createNewSession($survey_blob);
-
-		//survey info entered into db here
+		$db = db_connect();
+		$treatment = getTreatment($db);
+		$treatment_id = $treatment['id'];
+		global $treatment_message;
+		$treatment_message = $treatment['message'];
+		createNewSession($survey_blob, $treatment_id);
 	}
 	
-	function createNewSession($survey_blob) {
+	function createNewSession($survey_blob, $treatment_id) {
 		if(array_key_exists('forceNewSession', $_REQUEST)) {
 			$db = db_connect();
-			$session_id = startGameSession($db, $mturk_id, $survey_blob, false);
+			$session_id = startGameSession($db, $mturk_id, $survey_blob, $treatment_id, false);
 			setcookie('session_id', $session_id);
+			return $session_id;
 		}
 	}
 
@@ -117,7 +122,7 @@
 			}
 		}      
 
-		function getSession(mturk_id) {
+		function getSession() {
 			var session_id = $.cookie('session_id');
 
 			return session_id;
@@ -143,21 +148,21 @@
 				document.write("Please enable cookies to perform this task.");
 				return;
 			}
-			var session_id = getSession(mturk_id);
+			var session_id = getSession();
        
         var msPerTickSlow = 10;
         var numTicksLong = 2000;
 
         var config = new RenderSettings( $("#gameBoard") ); 
 
-        config.fogOfWar = true;
+        config.fogOfWar = false;
         config.numTicks = numTicksLong;
 
         var gDraw = new FlipItRenderEngine( config );
         var sb = new ScoreBoard( $("#scoreBoard"), config.xColor, config.yColor );        
 
         var game = new FlipItGame( gDraw, 
-          Players["humanPlayer"], Players["randomPlayer"], sb.update );
+          Players["humanPlayer"], Players["periodicPlayer"], sb.update );
 
         game.newGame();
         sb.update(0, 0);
@@ -180,6 +185,8 @@
 					 else {
 						 endMsg = "You lost! Better luck next time!";
 					 }
+					  game.resetAnchorAndPPT();
+					  replaceOppParams();
 
 					 flips = getCleanFlipString(game.flips);
 
@@ -192,7 +199,7 @@
 					 $('#flash').fadeIn('fast','linear');
 					 $('#flash').html(endMsg);
 					 $('#flash').css('text-align','center');
-					 $('#flash').fadeOut(6000,'linear');
+					 //$('#flash').fadeOut(6000,'linear');
 					 endMsgDisplayed = 'Yes';
 
 					 var myData = {action:'getSessionStats','session_id':session_id}; 
@@ -223,9 +230,32 @@
 					  sb.update(0, 0);
 					  var myData = {action:'startGameRun','session_id':session_id};
 					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
+
 					  game.start( msPerTickSlow, numTicksLong );
 				}
         });
+		  
+		  function replaceOppParams() {
+			  var msPerTickSlow = replaceOppParams.msPerTickSlow;
+			  var desc = $('#opponent_description').html();
+			  periodicPlayerTick = parseInt(Players['periodicPlayerTick']);
+			  periodicPlayerTick = periodicPlayerTick*msPerTickSlow/1000;
+			  periodicPlayerTick = '<b>1 flip every '+periodicPlayerTick+' seconds</b>';
+
+				anchor = parseInt(Players['anchor'])*msPerTickSlow/1000;
+				anchor = '<b>'+anchor+' seconds</b>';
+
+			  desc = desc.replace(/\d flip every \d(\.\d?\d?) seconds?/g, '%{alpha}');
+			  desc = desc.replace(/<b>\d(\.\d?\d?) seconds?/g, '<b>%{anchor}');
+			  
+			  desc = desc.replace(/%{alpha}/g,periodicPlayerTick);
+			  desc = desc.replace(/%{anchor}/g,anchor);
+
+
+
+
+			  $('#opponent_description').html(desc); 
+		  }
 
 		  $("#flipBtn").click( function() {
 			  if(game.running) {
@@ -240,6 +270,11 @@
 				  $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 			  }
 		  });
+
+		  game.resetAnchorAndPPT();
+
+		  replaceOppParams.msPerTickSlow = msPerTickSlow;
+		  replaceOppParams();
       });
     </script>
 
@@ -270,6 +305,14 @@
     <br><button id="flipBtn">Flip</button> to flip.
 
     <br><br>
+
+	 <h3>Important information about your opponent:</h3>
+	 <p id='opponent_description'>
+	 <?php
+	 echo $treatment_message;
+	 ?>
+	 </p>
+
 
 	 <button onclick='$("#rules_panel").fadeToggle("fast","linear")'>Show/hide rules</button>
 	 </div>

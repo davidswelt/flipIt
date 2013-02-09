@@ -36,6 +36,27 @@ function init() {
 	}
 }
 
+function getTreatment($db, $balanced = true) {
+	$q = "SELECT treatment.id, count(treatment_id) as count, opponent_description as message FROM treatment LEFT JOIN gameSession on treatment.id = treatment_id GROUP by treatment.id ORDER BY count(treatment_id) ASC";
+	$data = runQuery($db, $q);
+
+
+	if($balanced) {
+		$min_treatments = array();
+		$min_count = $data[0]['count'];
+
+		foreach($data as $row) {
+			if($row['count'] != $min_count) {
+				break;
+			}
+			$min_treatments[] = $row;
+		}
+		$data = $min_treatments;
+	}
+	$rand_index = array_rand($data);
+	return $data[$rand_index];
+}
+
 function getKeyIfPresent($key) {
 	if(!array_key_exists($key, $_REQUEST) || !$_REQUEST[$key]) {
    	logMessageAndDie("No $key provided!");
@@ -101,14 +122,15 @@ function sanitizeParams($allInts = false) {
 	}
 }
 
-function startGameSession($db, $mturk_id, $survey_blob, $die = true) {
-	$q = "INSERT INTO gameSession (mturk_id, started, survey_blob) VALUES ('$mturk_id', now(), '$survey_blob')";
+function startGameSession($db, $mturk_id, $survey_blob, $treatment_id, $die = true) {
+	$q = "INSERT INTO gameSession (mturk_id, started, survey_blob, treatment_id) VALUES ('$mturk_id', now(), '$survey_blob', $treatment_id)";
 	runQuery($db, $q, false);
 	$session_id = getMostRecentSessionId($db, $mturk_id);
 
 	if($die) {
 		logMessageAndDie($session_id);
 	}
+	return $session_id;
 }
 
 function startGameRun($db, $session_id) {

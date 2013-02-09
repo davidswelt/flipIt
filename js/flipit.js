@@ -21,7 +21,12 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 
   var xFlipCost = 100;
   var yFlipCost = 100;
-  
+
+  this.resetAnchorAndPPT = function() {
+	 Players.periodicPlayerTick = Math.floor((Math.random()*400)+100);
+	 Players.anchor = Math.floor((Math.random()*400));
+  }
+
   /**
    * Clears and refreshes all the varables to start a new game.
    **/
@@ -36,7 +41,6 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 
     this.xScore = 0;
     this.yScore = 0;
-
 
     renderer.drawBoard( 0, [] );
   }
@@ -70,6 +74,8 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
   this.endGame = function() {
     clearInterval( this.clock );
     this.running = false;
+	 Players.periodicPlayerTick = Math.floor((Math.random()*400)+100);
+	 Players.anchor = Math.floor((Math.random()*400));
 
     if ( scoreBoardFunct != null ) scoreBoardFunct( this.xScore, this.yScore );
   };
@@ -132,9 +138,7 @@ var Players = {
   "humanPlayer":function( ticks ){ return false }, 
   "randomPlayer":function( ticks ){ if(ticks % 79 == 0) return Math.random(ticks) < 0.3; },
 
-//need to adjust this to take an alpha param for the comp player
-//and an anchor for the offset
-  "periodicPlayer":function( ticks ){ return ticks % 200 == 0; }
+  "periodicPlayer":function( ticks ){ var anchor = Players['anchor']; var ppt = Players['periodicPlayerTick']; if(ticks >= anchor && (((anchor - ticks) % ppt) == 0)) {console.log(Players);console.log(ticks);return true;}return false; }
   };
 
 
