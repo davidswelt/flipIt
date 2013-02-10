@@ -1,22 +1,9 @@
 <html>
   <head>
-	<style>
-	body {
-		position: absolute;
-		left:30px;
-		top:30px;
-		max-width:800px;
-		margin: auto
-	}
-	ul, ol, li { 
-		margin-top: 10px; 
-	}
-	</style>
- 
 <?php
 
 	if(!array_key_exists('prevPage', $_REQUEST)) {
-		echo '</head><body>';
+		echo '</head>';
 		displayConsent();
 	}
 	elseif($_REQUEST['prevPage'] == 'consentForm') {
@@ -155,7 +142,7 @@
 
         var config = new RenderSettings( $("#gameBoard") ); 
 
-        config.fogOfWar = false;
+        config.fogOfWar = true;
         config.numTicks = numTicksLong;
 
         var gDraw = new FlipItRenderEngine( config );
@@ -255,9 +242,6 @@
 			  desc = desc.replace(/%{alpha}/g,periodicPlayerTick);
 			  desc = desc.replace(/%{anchor}/g,anchor);
 
-
-
-
 			  $('#opponent_description').html(desc); 
 		  }
 
@@ -270,8 +254,8 @@
 				  blueScores.push(game.xScore);
 				  redScores.push(game.yScore);
 				  
-				  var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)};
-				  $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
+			  //   var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)};
+			  //   $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 			  }
 		  });
 
@@ -281,15 +265,6 @@
 		  replaceOppParams();
       });
     </script>
-
-	 <style>
-	 div#flash {
-   	background: #6d7b8d;
-		border: 1px solid black;
-		padding: 3px 3px 3px 3px;
-	 }
-
-	 </style>
   </head>
 
   <title>FlipIt - The Game of Stealthy Takeover</title>
@@ -298,7 +273,7 @@
     <div id="top_panel">
       <h1 id="title">FlipIt - The Game of Stealthy Takeover</h1>
     </div>
-	  <div id='flash' style='visibility:hidden'></div>
+	  <div id='flash'></div>
 
     <div id="scoreBoard"></div>
     

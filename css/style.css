@@ -1,20 +1,36 @@
 body{
-  background-color:#ffffff;
-
-  margin-right:100px;
-  margin-left:100px;
-  margin-bottom:200px;
+	background-color:#ffffff;
+	margin-right:100px;
+	margin-left:100px;
+	margin-bottom:200px;
+	position: absolute;
+	left:30px;
+	top:30px;
+	max-width:800px;
+	margin: auto
 }
+
+ul, ol, li { 
+	margin-top: 10px; 
+}  
 
 body, div#rules_panel {
 	width:800px;
 }
 
 canvas{
-  margin-top:0px;
-  margin-bottom:0px;
+	margin-top:0px;
+	margin-bottom:0px;
 }
 
 #scoreBoard{
- text-align:right;
+	text-align:right;
 }
+
+
+div#flash {
+	background: #6d7b8d;
+	border: 1px solid black;
+	padding: 3px 3px 3px 3px;
+	visibility: hidden;
+} 
