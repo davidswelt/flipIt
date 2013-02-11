@@ -1,7 +1,19 @@
 <div id="rules_panel">
+ <h2>Basic Rules</h2>
+<p>You will be playing multiple rounds of a two-player game called FlipIt. The objective of FlipIt is to gain and maintain possession of the game board. 
+
+Until you take an action, the state of possession of the game board is hidden from your view. In this state, the board is shown in gray color. 
+
+The only action you have available is to "flip" the game board. When you flip the board, it will be shown to you who had possession of the game board until this very moment. This information will only be shown to you and not your opponent. At the same time, you also gain possession of the board, or maintain possession if you already owned the board.
+
+The same rules apply to your opponent. That is, you cannot observe if and when the opponent flipped the board in the past, until you take the action to flip the board yourself.
+
+Below, we break down the rules in more detail.</p>
+
+
  <p>You are playing a game called flipIt. You will play multiple rounds of this game. You must play all rounds. Click start to start the game. You are the blue player. The board will appear grey until you flip to learn the state of the board.</p>
 
- <h2>Rules</h2>
+ <h2>Detailed Rules</h2>
  <ul>
 	
 	<li>
@@ -55,7 +67,8 @@
 	  </p>
 
 	  An example game:
-	  <iframe src="/flipIt/drawgame.html?flips=100:X,200:Y,900:X" width="850" height="200" frameborder="0"></iframe>
+	  <img src='example_game.png' width='800' />
+	  <!-- <iframe src="/flipIt/drawgame.html?flips=100:X,200:Y,900:X" width="850" height="200" frameborder="0"></iframe> -->
 	  <p>   
 	  Lets examine the moves made in the game given above.
 	  </p>
@@ -64,7 +77,7 @@
 			0 second: The blue player starts in control.
 		 </li>
 		 <li>
-			1 second: the blue player plays 'flip' and reminds in control.
+			1 second: the blue player plays 'flip' and remains in control.
 		 </li>
 		 <li> 
 			2 seconds: the red player plays 'flip' and seizes control. The red player reminds in control for 7 seconds.

@@ -43,7 +43,7 @@
 	<li>
 	<strong>Voluntary Participation:</strong> Your decision to be in this research is voluntary. You can stop at any time. You do not have to answer any questions you do not want to answer.</li>
 		<li>
-		You must be 18 years of age or older to consent to take part in this research study.&nbsp; If you agree to take part in this research study and the information outlined above, please click the button below. If you do not consent, please exit the survey now.</li>
+		You must be 18 years of age or older to consent to take part in this research study.&nbsp; If you agree to take part in this research study and to the conditions outlined above, please click the button below. If you do not consent, please exit the survey now.</li>
 	</ol>
 
 	<form action='index.php' method='GET'>
