@@ -1,5 +1,11 @@
+<?php require_once(dirname(__FILE__).'/die_if_ie_under_9.php'); ?>
+
+<!DOCTYPE html>
 <html>
   <head>
+	<!--[if lt IE 9]>
+		<script src="js/html5shiv.js"></script>
+	<![endif]-->
 <?php
 
 	if(!array_key_exists('prevPage', $_REQUEST)) {
@@ -277,7 +283,7 @@
 
     <div id="scoreBoard"></div>
     
-    <canvas id="gameBoard" width="800" height="150"><h1>Canvas element not supported by your browser. Please use an HTML5 compatible browser like Chrome or Firefox.</h1></canvas>
+    <canvas id="gameBoard" width="800" height="150"></canvas>
 	 <br>
 
     <button id="startBtn">Start</button> to play as the blue player<span id='statsBox'></span>
