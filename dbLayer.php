@@ -14,7 +14,7 @@ function init() {
 		break;
 
 		case 'startGameRun':
-			startGameRun($db, getKeyIfPresent('session_id'));
+			startGameRun($db, getKeyIfPresent('session_id'),getKeyIfPresent('tick'), getKeyIfPresent('anchor'));
 		break;
 
 		case 'postFlip':
@@ -95,7 +95,7 @@ function getRunId($db, $session_id) {
 }
 
 function sanitizeParams($allInts = false) {
-	$ints = array('session_id', 'run_id'); 
+	$ints = array('session_id', 'run_id', 'tick', 'anchor'); 
    $alphanums = array('mturk_id', 'action');
 
 	foreach($_REQUEST as $k=>$v) {
@@ -133,8 +133,8 @@ function startGameSession($db, $mturk_id, $survey_blob, $treatment_id, $die = tr
 	return $session_id;
 }
 
-function startGameRun($db, $session_id) {
-	$q = "INSERT INTO gameRun (session_id, started) VALUES ('$session_id', now())";
+function startGameRun($db, $session_id, $tick, $anchor) {
+	$q = "INSERT INTO gameRun (session_id, started, tick, anchor) VALUES ('$session_id', now(), $tick, $anchor)";
 	runQuery($db, $q, false);
 	$game_id = getRunId($db, $session_id);
 

@@ -11,8 +11,6 @@ The same rules apply to your opponent. That is, you cannot observe if and when t
 Below, we break down the rules in more detail.</p>
 
 
- <p>You are playing a game called flipIt. You will play multiple rounds of this game. You must play all rounds. Click start to start the game. You are the blue player. The board will appear grey until you flip to learn the state of the board.</p>
-
  <h2>Detailed Rules</h2>
  <ul>
 	
@@ -64,13 +62,16 @@ Below, we break down the rules in more detail.</p>
 	  Blue rectangles represent periods of time in which you, the blue player, had control. 
 	  Red rectangles represent periods of time in which the red player was in control.
 	  The score is given in the upper left hand corner.
+
+	  <h4>The game in progress</h4>
+	  <img src='images/midgame.png' width='800' />
 	  </p>
 
-	  An example game:
-	  <img src='example_game.png' width='800' />
+	  <h2>An example game:</h2>
+	  <img src='images/example_game.png' width='800' />
 	  <!-- <iframe src="/flipIt/drawgame.html?flips=100:X,200:Y,900:X" width="850" height="200" frameborder="0"></iframe> -->
 	  <p>   
-	  Lets examine the moves made in the game given above.
+	  Let's examine the moves made in the game given above.
 	  </p>
 	  <ul>
 		 <li>

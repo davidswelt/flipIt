@@ -223,7 +223,7 @@
 				  if(!game.running) {
 					  started = true;
 					  sb.update(0, 0);
-					  var myData = {action:'startGameRun','session_id':session_id};
+					  var myData = {action:'startGameRun','session_id':session_id, 'tick':Players.periodicPlayerTick, 'anchor': Players.anchor};
 					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 
 						$('#flash').css('visibility', 'hidden');
