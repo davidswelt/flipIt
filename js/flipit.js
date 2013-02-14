@@ -138,7 +138,7 @@ var Players = {
   "humanPlayer":function( ticks ){ return false }, 
   "randomPlayer":function( ticks ){ if(ticks % 79 == 0) return Math.random(ticks) < 0.3; },
 
-  "periodicPlayer":function( ticks ){ var anchor = Players['anchor']; var ppt = Players['periodicPlayerTick']; if(ticks >= anchor && (((anchor - ticks) % ppt) == 0)) {console.log(Players);console.log(ticks);return true;}return false; }
+  "periodicPlayer":function( ticks ){ var anchor = Players['anchor']; var ppt = Players['periodicPlayerTick']; if(ticks >= anchor && (((anchor - ticks) % ppt) == 0)) {return true;}return false; }
 //  ,"periodicPlayer": function (t) {return false;}
   };
 
