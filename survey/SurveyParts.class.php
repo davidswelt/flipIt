@@ -3,6 +3,14 @@ class SurveyParts {
 	public $sections;
 
 	function fillArrays() {
+		$integrityPre = 'Please answer the following questions exactly as asked.';
+		$integrity = array('pre' => $integrityPre, 'title' => 'Additional questions',
+		'data' => array(
+		 'check5' => array('label' => 'Please select the rightmost option.', 'type' => 'likert', 'size' => '5'),
+		 'check3' => array('label' => 'Please select the middle option.', 'type' => 'likert', 'size' => '5'),
+		 'check1' => array('label' => 'Please select the left option.', 'type' => 'likert', 'size' => '5')
+
+		));
 		$demoPre = 'Please answer the following demographic questions.';
 		$demo = array('pre' => $demoPre, 'title' => 'Survey',
 		'data' => array(
@@ -35,7 +43,7 @@ class SurveyParts {
 		 'nfc5' => array('label' => 'The notion of thinking abstractly is not appealing to me.', 'type' => 'likert', 'size' => '9'),
 		));
 
-		$this->addComponents($demo, $rps, $nfc);
+		$this->addComponents($demo, $rps, $nfc, $integrity);
 	}
 
 	function __construct($randomizeSections = true, $firstStable = true) {

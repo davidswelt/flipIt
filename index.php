@@ -43,6 +43,9 @@
 		unset($_REQUEST['prevPage']);
 
 		sanitizeParams(array('mturk_id','forceNewSession', 'prevPage','action'));
+      integrityCheck('integrity');
+
+
 		collapseScale('rps', 9);
 		collapseScale('nfc', 9);
 		ksort($_REQUEST);
@@ -65,6 +68,18 @@
 			$session_id = startGameSession($db, $mturk_id, $survey_blob, $treatment_id, false);
 			setcookie('session_id', $session_id);
 			return $session_id;
+		}
+	}
+
+	function integrityCheck() {
+		foreach($_REQUEST as $k => $v) {
+			if(preg_match('/^check(\d)$/', $k, $matches)) {
+				$correct = intval($matches[1]);
+				if($check != $correct) {
+					die('<script>alert("You have answered an integrity question incorrectly. Please go back to the survey and read the directions carefully. Then, check your answers and try again to submit.");</script>');
+
+				}
+			}
 		}
 	}
 

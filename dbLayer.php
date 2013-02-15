@@ -77,7 +77,6 @@ function getSessionStats($db, $session_id) {
   	if($stats['num_runs_played']) {
    	$stats['bonus'] = getBonus($db, $session_id);
 	}
-
 	
 	$stats['session_id'] = intval($session_id);
 	$stats['num_runs_remaining'] = MAX_RUNS_PER_SESSION - $count;
@@ -146,6 +145,12 @@ function startGameRun($db, $session_id, $tick, $anchor) {
 }
 
 function getBonus($db, $session_id) {
+	$q = "SELECT * FROM bonus WHERE session_id=$session_id";
+   $data = runQuery($db, $q);
+	if(count($data) > 0) {
+   	return;
+	}
+
 	$q = "SELECT session_id, run_id, blue_score, treatment_id FROM gameResult, gameRun, gameSession WHERE gameRun.id = gameResult.run_id AND gameRun.session_id = gameSession.id AND session_id=$session_id";	
 	$data = runQuery($db, $q);
 
