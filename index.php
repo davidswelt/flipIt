@@ -5,16 +5,18 @@
   <head>
 <?php
 
-	if(!array_key_exists('prevPage', $_REQUEST)) {
-		echo '</head>';
-		displayConsent();
-	}
-	elseif($_REQUEST['prevPage'] == 'consentForm') {
-		echo '</head><body>';
-		displayInstructions();
-	}
-	elseif($_REQUEST['prevPage'] == 'instructions') {
-		displaySurvey();
+	if(!array_key_exists('session_id', $_COOKIE)) {
+		if(!array_key_exists('prevPage', $_REQUEST)) {
+			echo '</head>';
+			displayConsent();
+		}
+		elseif($_REQUEST['prevPage'] == 'consentForm') {
+			echo '</head><body>';
+			displayInstructions();
+		}
+		elseif($_REQUEST['prevPage'] == 'instructions') {
+			displaySurvey();
+		}
 	}
 	elseif($_REQUEST['prevPage'] == 'survey') {
 		processSurveyAndCreateSession();
@@ -56,7 +58,8 @@
 	}
 	
 	function createNewSession($survey_blob, $treatment_id) {
-		if(array_key_exists('forceNewSession', $_REQUEST)) {
+		if(!array_key_exists('session_id', $_COOKIE)) {
+		//if(array_key_exists('forceNewSession', $_REQUEST)) {
 			$db = db_connect();
 			$session_id = startGameSession($db, $mturk_id, $survey_blob, $treatment_id, false);
 			setcookie('session_id', $session_id);
@@ -132,35 +135,35 @@
 
 		$(document).ready(function() {
 			var url = location.toString();
-			var mturk_id = $.url(url).param('mturk_id');
 			testCookie();
 			if(!testCookie.enabled) {
 				document.write("Please enable cookies to perform this task.");
 				return;
 			}
 			var session_id = getSession();
-       
-        var msPerTickSlow = 10;
-        var numTicksLong = 2000;
 
-        var config = new RenderSettings( $("#gameBoard") ); 
+			var msPerTickSlow = 10;
+			var numTicksLong = 2000;
 
-        config.fogOfWar = true;
-        config.numTicks = numTicksLong;
+			var config = new RenderSettings( $("#gameBoard") ); 
 
-        var gDraw = new FlipItRenderEngine( config );
-        var sb = new ScoreBoard( $("#scoreBoard"), config.xColor, config.yColor );        
+			config.fogOfWar = true;
+			config.numTicks = numTicksLong;
 
-        var game = new FlipItGame( gDraw, 
-          Players["humanPlayer"], Players["periodicPlayer"], sb.update );
+			var gDraw = new FlipItRenderEngine( config );
+			var sb = new ScoreBoard( $("#scoreBoard"), config.xColor, config.yColor );        
 
-        game.newGame();
-        sb.update(0, 0);
-		  var run_id = null;
-		  var started = false;
-		  var blueScores = [];
-		  var redScores = [];
-		  var endMsgDisplayed = 'N/A';
+			var game = new FlipItGame( gDraw, Players["humanPlayer"], Players["periodicPlayer"], sb.update );
+
+			game.newGame();
+			sb.update(0, 0);
+			var run_id = null;
+			var started = false;
+			var blueScores = [];
+			var redScores = [];
+			var endMsgDisplayed = 'N/A';
+			var firstTime = true;
+			window.game = game;
 
 		  setInterval(function() {
 			  if(game.running) {
@@ -168,47 +171,39 @@
 					endMsgDisplayed = 'No';
 			  }
 			  else {
-				  if(endMsgDisplayed == 'No') {
+				  if(endMsgDisplayed != 'Yes') {
 					 if(game.xScore - game.yScore > 0) {
 						 endMsg = "Good job! You won!";
 					 }
 					 else {
 						 endMsg = "You lost! Better luck next time!";
 					 }
-					  game.resetAnchorAndPPT();
-					  replaceOppParams();
+					 game.resetAnchorAndPPT();
+					 replaceOppParams();
 
 					 flips = getCleanFlipString(game.flips);
-
-					 blueScores.push(game.xScore);
-					 redScores.push(game.yScore);
 					 
-					 var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)}; 
-					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
-					  //$('#flash').hide();
-						$('#flash').css('visibility', 'visible');
-					 //$('#flash').fadeIn('fast','linear');
-					 $('#flash').html(endMsg);
-					 $('#flash').css('text-align','center');
-					 //$('#flash').fadeOut(6000,'linear');
-					 endMsgDisplayed = 'Yes';
-
-					 var myData = {action:'getSessionStats','session_id':session_id}; 
-					 var session_stats = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false});
-					 session_stats = JSON.parse(session_stats.responseText);
-					 var num_runs_remaining = session_stats['num_runs_remaining'];
-					 var num_runs_played = session_stats['num_runs_played'];
-
-		  			 if(num_runs_remaining > 0) {
-						 $('#startBtn').html('Start next game');
-						 $('#statsBox').html(' ('+num_runs_remaining+' runs left, '+num_runs_played+' runs played)');
+					 if(firstTime) {
+                	handlePossibleSessionEnd(session_id);
+						firstTime = false;
 					 }
-					 else {
-                	$('body').hide();
-						alert('You have played enough today. The window will now be closed.');
-						window.open('', '_self', '');
-						window.close();
+
+					 if(flips != '') {
+						 handlePossibleSessionEnd(session_id);
+
+						 blueScores.push(game.xScore);
+						 redScores.push(game.yScore);
+						 
+						 var myData = {action:'postFlip','run_id':run_id,'flips':flips,'bs':JSON.stringify(blueScores), 'rs':JSON.stringify(redScores)}; 
+						 run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
+						 $('#flash').css('visibility', 'visible');
+						 $('#flash').html(endMsg);
+						 $('#flash').css('text-align','center');
+						 endMsgDisplayed = 'Yes';
 					 }
+
+					 blueScores = [];
+					 redScores = [];
 				  }
 
 				  $('#startBtn').removeAttr('disabled')
@@ -228,25 +223,7 @@
 					  game.start( msPerTickSlow, numTicksLong );
 				}
         });
-		  
-		  function replaceOppParams() {
-			  var msPerTickSlow = replaceOppParams.msPerTickSlow;
-			  var desc = $('#opponent_description').html();
-			  periodicPlayerTick = parseInt(Players['periodicPlayerTick']);
-			  periodicPlayerTick = periodicPlayerTick*msPerTickSlow/1000;
-			  periodicPlayerTick = '<b>1 flip every '+periodicPlayerTick+' seconds</b>';
 
-				anchor = parseInt(Players['anchor'])*msPerTickSlow/1000;
-				anchor = '<b>'+anchor+' seconds</b>';
-
-			  desc = desc.replace(/\d flip every \d(\.\d?\d?) seconds?/g, '%{alpha}');
-			  desc = desc.replace(/<b>\d(\.\d?\d?) seconds?/g, '<b>%{anchor}');
-			  
-			  desc = desc.replace(/%{alpha}/g,periodicPlayerTick);
-			  desc = desc.replace(/%{anchor}/g,anchor);
-
-			  $('#opponent_description').html(desc); 
-		  }
 
 		  $("#flipBtn").click( function() {
 			  if(game.running) {
@@ -267,6 +244,47 @@
 		  replaceOppParams.msPerTickSlow = msPerTickSlow;
 		  replaceOppParams();
       });
+		  
+		function replaceOppParams() {
+			var msPerTickSlow = replaceOppParams.msPerTickSlow;
+			var desc = $('#opponent_description').html();
+			periodicPlayerTick = parseInt(Players['periodicPlayerTick']);
+			periodicPlayerTick = periodicPlayerTick*msPerTickSlow/1000;
+			periodicPlayerTick = '<b>1 flip every '+periodicPlayerTick+' seconds</b>';
+
+			anchor = parseInt(Players['anchor'])*msPerTickSlow/1000;
+			anchor = '<b>'+anchor+' seconds</b>';
+
+			desc = desc.replace(/\d flip every \d(\.\d?\d?) seconds?/g, '%{alpha}');
+			desc = desc.replace(/<b>\d(\.\d?\d?) seconds?/g, '<b>%{anchor}');
+
+			desc = desc.replace(/%{alpha}/g,periodicPlayerTick);
+			desc = desc.replace(/%{anchor}/g,anchor);
+
+			$('#opponent_description').html(desc); 
+		}   
+
+		function handlePossibleSessionEnd(session_id) {
+			var myData = {action:'getSessionStats','session_id':session_id}; 
+			var session_stats = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false});
+			session_stats = JSON.parse(session_stats.responseText);
+			var num_runs_remaining = session_stats['num_runs_remaining'];
+			var num_runs_played = session_stats['num_runs_played'];
+
+			if(num_runs_remaining > 0) {
+				$('#startBtn').html('Start next game');
+				$('#statsBox').html(' ('+num_runs_remaining+' runs left, '+num_runs_played+' runs played)');
+			}
+			else {
+				$('body').hide();
+
+				var bonus = session_stats['bonus'];
+
+				alert('Thank you for finishing all rounds. You will be paid an additional '+bonus+'. Please copy this message for your records. The window will now be closed.');
+				window.open('', '_self', '');
+//				window.close();
+			} 
+		}
     </script>
   </head>
 

@@ -39,7 +39,7 @@
 	<li>
 	<strong>Right to Ask Questions:</strong> Please contact Alan Nochenson at anochenson@psu.edu with questions or concerns about this study. </li>
 	<li>
-	<strong>Payment for participation:</strong> You will be compensated according to your performance in this study. For completing the task, you are guaranteed the amount listed on the Mechanical Turk HIT that you've accepted, and, you will be paid an additional sum based on your performance in the game. You will be notified of the additional amount at the completion of the game.</li>
+	<strong>Payment for participation:</strong> You will be compensated according to your performance in this study. For completing the task, you are guaranteed the amount listed on the Mechanical Turk HIT that you've accepted, and, you will be paid an additional sum based on your performance in the game. You will be notified of the additional amount at the completion of the game. The more total points you earn during the games, the more money you will receive.</li>
 	<li>
 	<strong>Voluntary Participation:</strong> Your decision to be in this research is voluntary. You can stop at any time. You do not have to answer any questions you do not want to answer. If this is the case, please abandon the Mechanical Turk HIT and exit the survey or game.</li>
 		<li>

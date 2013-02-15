@@ -74,6 +74,11 @@ function getSessionStats($db, $session_id) {
 	$count = $data[0]['count(id)'];
 
 	$stats['num_runs_played'] = intval($count);
+
+  	if($stats['num_runs_played']) {
+   	$stats['bonus'] = getBonus($db, $session_id);
+	}
+
 	
 	$stats['session_id'] = intval($session_id);
 	$stats['num_runs_remaining'] = MAX_RUNS_PER_SESSION - $count;
@@ -139,6 +144,47 @@ function startGameRun($db, $session_id, $tick, $anchor) {
 	$game_id = getRunId($db, $session_id);
 
 	logMessageAndDie($game_id);
+}
+
+function getBonus($db, $session_id) {
+	$q = "SELECT session_id, run_id, blue_score, treatment_id FROM gameResult, gameRun, gameSession WHERE gameRun.id = gameResult.run_id AND gameRun.session_id = gameSession.id AND session_id=$session_id";	
+	$data = runQuery($db, $q);
+
+	$total_delta = 0;
+	$games_won = 0;
+
+   for($i=0;$i<count($data);$i++) {
+		if($i<NUM_PRACTICE_RUNS) {
+      	continue;
+		}
+
+		$row = $data[$i];
+
+		$bs = json_decode($row['blue_score']);
+		$bs = $bs[count($bs)-1];
+
+		$rs = json_decode($row['red_score']);
+		$rs = $bs[count($rs)-1];
+
+		$total_delta += $bs-$rs;
+		if($bs > $rs) {
+      	$games_won++;
+		}
+	}
+	$bonus = $total_delta / (2000*(MAX_RUNS_PER_SESSION-NUM_PRACTICE_RUNS));
+	$bonus *= BONUS_MULTIPLIER;
+	$bonus = max(0, $bonus);
+	$bonus = sprintf("$%0.2f", $bonus);
+
+	recordbonus($db, $bonus, $mturk_id, $data[0]['treatment_id']);
+
+	return $bonus;
+}
+
+function recordbonus($db, $bonus, $mturk_id, $treatment_id) {
+	$q = "INSERT INTO bonus (mturk_id, amount, treatment_id, finished) VALUES ('$mturk_id', '$bonus', $treatment_id, now())";
+
+	runQuery($db, $q, false);
 }
 
 function postFlip($db, $run_id) {
