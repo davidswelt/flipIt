@@ -40,7 +40,6 @@ function getTreatment($db, $balanced = true) {
 	$q = "SELECT treatment.id, count(treatment_id) as count, opponent_description as message FROM treatment LEFT JOIN gameSession on treatment.id = treatment_id GROUP by treatment.id ORDER BY count(treatment_id) ASC";
 	$data = runQuery($db, $q);
 
-
 	if($balanced) {
 		$min_treatments = array();
 		$min_count = $data[0]['count'];

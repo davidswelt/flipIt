@@ -5,7 +5,11 @@
   <head>
 <?php
 
-	if(!array_key_exists('session_id', $_COOKIE)) {
+	if(array_key_exists('session_id', $_COOKIE) ||
+		$_REQUEST['prevPage'] == 'survey') {
+		processSurveyAndCreateSession();
+	}
+	else {
 		if(!array_key_exists('prevPage', $_REQUEST)) {
 			echo '</head>';
 			displayConsent();
@@ -17,9 +21,6 @@
 		elseif($_REQUEST['prevPage'] == 'instructions') {
 			displaySurvey();
 		}
-	}
-	elseif($_REQUEST['prevPage'] == 'survey') {
-		processSurveyAndCreateSession();
 	}
 
 	function displayConsent() {
@@ -50,7 +51,7 @@
 		//get treatment stuff here
 		//save it and use it later
 		$db = db_connect();
-		$treatment = getTreatment($db);
+		$treatment = getTreatment($db, true);
 		$treatment_id = $treatment['id'];
 		global $treatment_message;
 		$treatment_message = $treatment['message'];
@@ -179,7 +180,6 @@
 						 endMsg = "You lost! Better luck next time!";
 					 }
 					 game.resetAnchorAndPPT();
-					 replaceOppParams();
 
 					 flips = getCleanFlipString(game.flips);
 					 
@@ -189,6 +189,7 @@
 					 }
 
 					 if(flips != '') {
+						 replaceOppParams();
 						 handlePossibleSessionEnd(session_id);
 
 						 blueScores.push(game.xScore);
@@ -280,7 +281,8 @@
 
 				var bonus = session_stats['bonus'];
 
-				alert('Thank you for finishing all rounds. You will be paid an additional '+bonus+'. Please copy this message for your records. The window will now be closed.');
+				var msg = '<h1 style="text-align:center;margin: 50px 50px 50px 50px">Thank you for finishing all rounds. You will be paid an additional '+bonus+' based on your performance. Please copy this message for your records and close the window.</h1>';
+				$('html').html(msg);
 				window.open('', '_self', '');
 //				window.close();
 			} 
