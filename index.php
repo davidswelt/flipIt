@@ -3,9 +3,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-	<!--[if lt IE 9]>
-		<script src="js/html5shiv.js"></script>
-	<![endif]-->
 <?php
 
 	if(!array_key_exists('prevPage', $_REQUEST)) {
