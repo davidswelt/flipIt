@@ -36,7 +36,15 @@ function init() {
 	}
 }
 
-function getTreatment($db, $balanced = true) {
+function getOldTreatment($db, $session_id) {
+	$q = "SELECT treatment_id as id, opponent_description as message FROM gameSession, treatment WHERE treatment.id = treatment_id AND gameSession.id = $session_id";
+
+	$data = runQuery($db, $q);
+
+	return $data[0];
+}
+
+function getNewTreatment($db, $balanced = true) {
 	$q = "SELECT treatment.id, count(treatment_id) as count, opponent_description as message FROM treatment LEFT JOIN gameSession on treatment.id = treatment_id GROUP by treatment.id ORDER BY count(treatment_id) ASC";
 	$data = runQuery($db, $q);
 
@@ -145,19 +153,20 @@ function startGameRun($db, $session_id, $tick, $anchor) {
 }
 
 function getBonus($db, $session_id) {
-	$q = "SELECT * FROM bonus WHERE session_id=$session_id";
+	$q = "SELECT amount FROM bonus WHERE session_id=$session_id";
    $data = runQuery($db, $q);
 	if(count($data) > 0) {
-   	return;
+   	return $data[0]['amount'];
 	}
 
-	$q = "SELECT session_id, run_id, blue_score, treatment_id FROM gameResult, gameRun, gameSession WHERE gameRun.id = gameResult.run_id AND gameRun.session_id = gameSession.id AND session_id=$session_id";	
+	$q = "SELECT session_id, run_id, blue_score, treatment_id, mturk_id FROM gameResult, gameRun, gameSession WHERE gameRun.id = gameResult.run_id AND gameRun.session_id = gameSession.id AND session_id=$session_id";	
 	$data = runQuery($db, $q);
 
 	$total_delta = 0;
 	$games_won = 0;
 
    for($i=0;$i<count($data);$i++) {
+		//don't include score from practice rounds
 		if($i<NUM_PRACTICE_RUNS) {
       	continue;
 		}
@@ -175,18 +184,17 @@ function getBonus($db, $session_id) {
       	$games_won++;
 		}
 	}
-	$bonus = $total_delta / (2000*(MAX_RUNS_PER_SESSION-NUM_PRACTICE_RUNS));
-	$bonus *= BONUS_MULTIPLIER;
+	$bonus = $total_delta * POINTS_EXCHANGE_RATE; 
 	$bonus = max(0, $bonus);
 	$bonus = sprintf("$%0.2f", $bonus);
 
-	recordbonus($db, $bonus, $mturk_id, $data[0]['treatment_id']);
+	recordbonus($db, $bonus, $mturk_id, $session_id, $data[0]['treatment_id']);
 
 	return $bonus;
 }
 
-function recordbonus($db, $bonus, $mturk_id, $treatment_id) {
-	$q = "INSERT INTO bonus (mturk_id, amount, treatment_id, finished) VALUES ('$mturk_id', '$bonus', $treatment_id, now())";
+function recordbonus($db, $bonus, $mturk_id, $session_id) {
+	$q = "INSERT INTO bonus (mturk_id, amount, session_id, finished) VALUES ('$mturk_id', '$bonus', $session_id, now())";
 
 	runQuery($db, $q, false);
 }

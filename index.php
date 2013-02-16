@@ -54,14 +54,21 @@
 		//get treatment stuff here
 		//save it and use it later
 		$db = db_connect();
-		$treatment = getTreatment($db, true);
+		createNewSession($db, $survey_blob);
+	}
+	
+	function createNewSession($db, $survey_blob) {
+		$treatment = getNewTreatment($db, true);
+
+		if(array_key_exists('session_id', $_COOKIE)) {
+			$treatment = getOldTreatment($db, intval($_COOKIE['session_id']));
+		}
+
+
 		$treatment_id = $treatment['id'];
 		global $treatment_message;
 		$treatment_message = $treatment['message'];
-		createNewSession($survey_blob, $treatment_id);
-	}
-	
-	function createNewSession($survey_blob, $treatment_id) {
+
 		if(!array_key_exists('session_id', $_COOKIE)) {
 		//if(array_key_exists('forceNewSession', $_REQUEST)) {
 			$db = db_connect();
@@ -171,7 +178,7 @@
 			var gDraw = new FlipItRenderEngine( config );
 			var sb = new ScoreBoard( $("#scoreBoard"), config.xColor, config.yColor );        
 
-			var game = new FlipItGame( gDraw, Players["humanPlayer"], Players["randomPlayer"], sb.update );
+			var game = new FlipItGame( gDraw, Players["humanPlayer"], Players["periodicPlayer"], sb.update );
 
 			game.newGame();
 			sb.update(0, 0);
@@ -187,7 +194,6 @@
 			  if(game.running) {
                $('#startBtn').attr('disabled','disabled')
 					endMsgDisplayed = 'No';
-					handlePossibleSessionEnd.handled = false;
 			  }
 			  else {
 				  if(endMsgDisplayed != 'Yes') {
@@ -286,10 +292,6 @@
 		}   
 
 		function handlePossibleSessionEnd(session_id) {
-			if(handlePossibleSessionEnd.handled) {
-         	return;
-			}
-			handlePossibleSessionEnd.handled = true;
 			var myData = {action:'getSessionStats','session_id':session_id}; 
 			var session_stats = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false});
 			session_stats = JSON.parse(session_stats.responseText);
@@ -302,10 +304,17 @@
 			}
 			else {
 				$('body').hide();
-
 				var bonus = session_stats['bonus'];
 
-				var msg = '<h1 style="text-align:center;margin: 50px 50px 50px 50px">Thank you for finishing all rounds. You will be paid an additional '+bonus+' based on your performance. Please copy this message for your records and close the window.</h1>';
+				var msg = '<h1 style="text-align:center;margin: 50px 50px 50px 50px">Thank you for finishing all rounds.'; 
+				
+				var paystring = 'Your performance did not warrant any bonus payments.';
+				if(bonus) {
+					paystring = 'You will be paid an additional '+bonus+' based on your performance.';
+				}
+				msg += ' '+paystring;
+				
+				msg += ' Please copy this message for your records and close the window.</h1>';
 				$('html').html(msg);
 				window.open('', '_self', '');
 //				window.close();
