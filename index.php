@@ -171,7 +171,7 @@
 			var gDraw = new FlipItRenderEngine( config );
 			var sb = new ScoreBoard( $("#scoreBoard"), config.xColor, config.yColor );        
 
-			var game = new FlipItGame( gDraw, Players["humanPlayer"], Players["periodicPlayer"], sb.update );
+			var game = new FlipItGame( gDraw, Players["humanPlayer"], Players["randomPlayer"], sb.update );
 
 			game.newGame();
 			sb.update(0, 0);

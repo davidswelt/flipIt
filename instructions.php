@@ -54,12 +54,13 @@ Below, we break down the rules in more detail.
 	  Blue rectangles represent periods of time in which you, the blue player, had control. 
 	  Red rectangles represent periods of time in which the red player was in control.
 	  The score is given in the upper left hand corner.
-
-	  <h4>The game in progress</h4>
-	  <img src='images/midgame.png' width='800' />
 	  </p>
 
 	  <h2>An example game:</h2>
+	  <h4>The game in progress:</h4>
+	  <img src='images/midgame.png' width='800' />
+
+	  <h4>The game when finished:</h4>
 	  <img src='images/example_game.png' width='800' />
 	  <!-- <iframe src="/flipIt/drawgame.html?flips=100:X,200:Y,900:X" width="850" height="200" frameborder="0"></iframe> -->
 	  <p>   
@@ -67,29 +68,41 @@ Below, we break down the rules in more detail.
 	  </p>
 	  <ul>
 		 <li>
-			0 second: The blue player starts in control.
+			<i>1st second</i>: The blue player starts in control.
 		 </li>
 		 <li>
-			1 second: the blue player plays 'flip' and remains in control.
+			<i>2nd second:</i> The red player plays 'flip' and gains control. The red player plays 'flip' again less than a second later and remains in control.
 		 </li>
 		 <li> 
-			2 seconds: the red player plays 'flip' and seizes control. The red player reminds in control for 7 seconds.
+			<i>3rd second:</i> The blue player plays 'flip' and regains control. He maintains control for a bit over 2 seconds.
 		 </li>
 		 <li>
-			9 seconds: the blue player plays 'flip' and takes control back. 
+			<i>5th second:</i> The red player plays 'flip' and regains control. He keeps control for less than a second.
 		 </li>
 		 <li>
-			10 seconds: the game ends.
+			<i>6th second:</i> The blue player plays 'flip' and regains control. He keeps control for about 2 seconds.
+		 </li>                                                         
+		 <li>
+			<i>7th second:</i> The red player plays 'flip' and regains control. He keeps control for about 1 second.
+		 </li>                                                         
+		 <li>
+			<i>9th second:</i> The blue player plays 'flip' and regains control. He maintains control for 4 seconds.
+		 </li>                                                          
+		 <li>
+			<i>12th second:</i> The red player plays 'flip' and regains control. He maintains control for the rest of the game.
+		 </li>                                                          
+		 <li>
+			<i>20th second:</i> The game ends.
 		 </li>
 	  </ul>
 	  <p> 
-	  The blue player was in control for <b>2 + 1 = 3</b> seconds gaining <b>300</b> points, playing flip twice costed the blue player <b>2 * -100 = -200</b> points, for a total score of <b>100</b> points.
+	  The blue player was in control for <b>8.05</b> seconds earning <b>805</b> points, and played 'flip' 3 times, costing <b>300</b> points. This gives him a total score of <b>500</b> points.
 	  </p>
 	  <p>
-	  The red player was in control for <b>7</b> seconds gaining <b>700</b> points, playing flip only once at a cost of <b>-100</b> points, for a total score of <b>600</b> points.
+	  The blue player was in control for <b>6.95</b> seconds earning <b>695</b> points, and played 'flip' 4 times, costing <b>400</b> points. This gives him a total score of <b>295</b> points.
 	  </p>
 	  <p>
-	  The red player has more points than the blue player and thus wins.
+	  The blue player has more points than the red player and thus wins.
 	  </p>
 	</li>
  </ul>
