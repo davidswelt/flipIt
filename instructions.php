@@ -1,30 +1,19 @@
 <div id="rules_panel">
  <h2>Basic Rules</h2>
-<p>You will be playing multiple rounds of a two-player game called FlipIt. The objective of FlipIt is to gain and maintain possession of the game board. 
+<ul style='list-style-type: none'><li>
+You will be playing multiple rounds of a two-player game called FlipIt. The objective of FlipIt is to gain and maintain possession of the game board. 
 
 Until you take an action, the state of possession of the game board is hidden from your view. In this state, the board is shown in gray color. 
 
-The only action you have available is to "flip" the game board. When you flip the board, it will be shown to you who had possession of the game board until this very moment. This information will only be shown to you and not your opponent. At the same time, you also gain possession of the board, or maintain possession if you already owned the board.
+The only action you have available is to 'flip' the game board. When you flip the board, it will be shown to you who had possession of the game board until this very moment. This information will only be shown to you and not your opponent. At the same time, you also gain possession of the board, or maintain possession if you already owned the board.
 
 The same rules apply to your opponent. That is, you cannot observe if and when the opponent flipped the board in the past, until you take the action to flip the board yourself.
 
-Below, we break down the rules in more detail.</p>
-
+Below, we break down the rules in more detail.
+</li></ul>
 
  <h2>Detailed Rules</h2>
  <ul>
-	
-	<li>
-	  <h3>Basic</h3>
-	  <p>
-	  You, the blue player, always start in control of the board. The red player can play a flip and gain control at any time.
-	  The state of the board is obscured in grey.
-	  You and the red player only learn the state of the game by playing 'flip'.
-	  You can gain control by playing flip.
-	  The game ends after 10 seconds.
-	  </p>
-	</li>
- 
 	<li>
 	  <h3>How to Win</h3>
 	  <p>
@@ -38,14 +27,18 @@ Below, we break down the rules in more detail.</p>
 	  <p>
 	  You gain <b>100</b> points per second that you are in control.
 	  <br>
-	  You lose <b>100</b> points when you play 'flip'.
+	  You earn <b>0</b> points while your opponent is in control.
+	  <br>
+	  You pay <b>100</b> points when you play 'flip'.
+	  <br><br>
+	  You begin with <b>0</b> points. Scores are updated when you play a 'flip' and at the end of the game.
 	  </p>
 	</li>
 	
 	<li>  
 	  <h3>Moves</h3>
 	  <p>
-	  Your only move is to play 'flip'
+	  Your only move is to play 'flip'.
 	  If you are in control and you play 'flip' you remain in control.
 	  If you are not in control and you play 'flip' you regain control.
 	  Only one player can be in control at a time.
@@ -56,9 +49,8 @@ Below, we break down the rules in more detail.</p>
 	  <h3>The Board</h3>
 	  <p>
 	  The board displays the current known information about the game.
-	  Each 'flip' played is marked with a circle.
+	  Each 'flip' played is marked with a dot.
 	  You can only see information that was revealed by your flips.
-	  The scores are updated when you play a 'flip' and reveal the current state of the game.
 	  Blue rectangles represent periods of time in which you, the blue player, had control. 
 	  Red rectangles represent periods of time in which the red player was in control.
 	  The score is given in the upper left hand corner.

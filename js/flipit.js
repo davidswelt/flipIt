@@ -24,7 +24,7 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 
   this.resetAnchorAndPPT = function() {
 	 Players.periodicPlayerTick = Math.floor((Math.random()*400)+100);
-	 Players.anchor = Math.floor((Math.random()*400));
+	 Players.anchor = Math.floor((Math.random()*400)+10);
   }
 
   /**

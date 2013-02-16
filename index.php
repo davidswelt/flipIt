@@ -43,7 +43,7 @@
 		unset($_REQUEST['prevPage']);
 
 		sanitizeParams(array('mturk_id','forceNewSession', 'prevPage','action'));
-      integrityCheck('integrity');
+      integrityCheck();
 
 
 		collapseScale('rps', 9);
@@ -75,6 +75,8 @@
 		foreach($_REQUEST as $k => $v) {
 			if(preg_match('/^check(\d)$/', $k, $matches)) {
 				$correct = intval($matches[1]);
+				$check = $v;
+
 				if($check != $correct) {
 					die('<script>alert("You have answered an integrity question incorrectly. Please go back to the survey and read the directions carefully. Then, check your answers and try again to submit.");</script>');
 
@@ -185,6 +187,7 @@
 			  if(game.running) {
                $('#startBtn').attr('disabled','disabled')
 					endMsgDisplayed = 'No';
+					handlePossibleSessionEnd.handled = false;
 			  }
 			  else {
 				  if(endMsgDisplayed != 'Yes') {
@@ -205,6 +208,8 @@
 
 					 if(flips != '') {
 						 replaceOppParams();
+
+						 //make it so this is only called once
 						 handlePossibleSessionEnd(session_id);
 
 						 blueScores.push(game.xScore);
@@ -281,6 +286,10 @@
 		}   
 
 		function handlePossibleSessionEnd(session_id) {
+			if(handlePossibleSessionEnd.handled) {
+         	return;
+			}
+			handlePossibleSessionEnd.handled = true;
 			var myData = {action:'getSessionStats','session_id':session_id}; 
 			var session_stats = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false});
 			session_stats = JSON.parse(session_stats.responseText);
