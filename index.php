@@ -208,7 +208,7 @@
 					 flips = getCleanFlipString(game.flips);
 					 
 					 if(firstTime) {
-                	handlePossibleSessionEnd(session_id);
+                	handleSessionChange(session_id);
 						firstTime = false;
 					 }
 
@@ -216,7 +216,7 @@
 						 replaceOppParams();
 
 						 //make it so this is only called once
-						 handlePossibleSessionEnd(session_id);
+						 handleSessionChange(session_id);
 
 						 blueScores.push(game.xScore);
 						 redScores.push(game.yScore);
@@ -291,34 +291,63 @@
 			$('#opponent_description').html(desc); 
 		}   
 
-		function handlePossibleSessionEnd(session_id) {
+		function pluralize_stupid(num, word) {
+      	return (num > 1) ? word+'s': word;
+		}
+
+		function value_and_plural(num, word) {
+      	return num+" "+pluralize_stupid(num, word);
+		}
+
+		//handles changing from practice to normal
+		//and normal game state to session end
+		function handleSessionChange(session_id) {
 			var myData = {action:'getSessionStats','session_id':session_id}; 
 			var session_stats = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false});
 			session_stats = JSON.parse(session_stats.responseText);
 			var num_runs_remaining = session_stats['num_runs_remaining'];
-			var num_runs_played = session_stats['num_runs_played'];
+			var num_practice_runs_remaining = session_stats['num_practice_runs_remaining'];
 
 			if(num_runs_remaining > 0) {
 				$('#startBtn').html('Start next game');
-				$('#statsBox').html(' ('+num_runs_remaining+' runs left, '+num_runs_played+' runs played)');
+            var infoString = '';
+
+				if(num_practice_runs_remaining > 0) {
+            	infoString = value_and_plural(num_practice_runs_remaining, 'practice run')+' left';
+					$('h1#title').html('FlipIt - Practice game');
+					$('h1#title').css('color', '#CC1100');
+				}
+				else {
+					$('h1#title').html('FlipIt - Real game');
+					if(num_practice_runs_remaining == 0) {
+               	alert('Each game you play from now on will be counted. Results of these games will affect your bonus payment. You must play '+value_and_plural(num_runs_remaining, 'more run')+' in order to be paid.');
+					}
+					infoString = value_and_plural(num_runs_remaining, 'run')+' left, '+value_and_plural(session_stats['num_runs_played'],'run')+' played';
+				}
+
+				$('#statsBox').html(' ('+infoString+')');
 			}
 			else {
-				$('body').hide();
-				var bonus = session_stats['bonus'];
-
-				var msg = '<h1 style="text-align:center;margin: 50px 50px 50px 50px">Thank you for finishing all rounds.'; 
-				
-				var paystring = 'Your performance did not warrant any bonus payments.';
-				if(bonus) {
-					paystring = 'You will be paid an additional '+bonus+' based on your performance.';
-				}
-				msg += ' '+paystring;
-				
-				msg += ' Please copy this message for your records and close the window.</h1>';
-				$('html').html(msg);
-				window.open('', '_self', '');
-//				window.close();
+				handleSessionEnd(session_stats['bonus']);
 			} 
+		}
+
+		function handleSessionEnd(bonus) {
+			$('body').hide();
+
+			var msg = '<h1 style="text-align:center;margin: 50px 50px 50px 50px">Thank you for finishing all rounds.'; 
+			
+			var paystring = 'Your performance did not warrant any bonus payments.';
+			
+			if(bonus && bonus != '$0.00') {
+				paystring = 'You will be paid an additional '+bonus+' based on your performance.';
+			}
+			msg += ' '+paystring;
+			
+			msg += ' You will also be paid the amount specified in the HIT that you accepted (if your session is found to be legitimate). Please copy this message for your records and close the window.</h1>';
+			$('html').html(msg);
+			window.open('', '_self', '');
+//			window.close(); 
 		}
     </script>
   </head>

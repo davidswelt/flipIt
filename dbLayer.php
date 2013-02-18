@@ -88,6 +88,7 @@ function getSessionStats($db, $session_id) {
 	
 	$stats['session_id'] = intval($session_id);
 	$stats['num_runs_remaining'] = MAX_RUNS_PER_SESSION - $count;
+	$stats['num_practice_runs_remaining'] = NUM_PRACTICE_RUNS - $count;
 	logMessageAndDie(json_encode($stats));
 }
 
@@ -163,7 +164,7 @@ function getBonus($db, $session_id) {
 	$data = runQuery($db, $q);
 
 	$total_delta = 0;
-	$games_won = 0;
+	$deltas = array();
 
    for($i=0;$i<count($data);$i++) {
 		//don't include score from practice rounds
@@ -179,11 +180,17 @@ function getBonus($db, $session_id) {
 		$rs = json_decode($row['red_score']);
 		$rs = $bs[count($rs)-1];
 
-		$total_delta += $bs-$rs;
-		if($bs > $rs) {
-      	$games_won++;
-		}
+		$deltas[] = $bs-$rs;
 	}
+
+	$deltas = array_map(function($a) {
+		return max(0, $a);
+	}, $deltas);
+
+	$total_delta = array_reduce($deltas, function($total, $item) {
+   	$total += $item;
+	}, 0);
+
 	$bonus = $total_delta * POINTS_EXCHANGE_RATE; 
 	$bonus = max(0, $bonus);
 	$bonus = sprintf("$%0.2f", $bonus);

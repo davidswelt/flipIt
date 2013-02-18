@@ -105,6 +105,13 @@ Below, we break down the rules in more detail.
 	  The blue player has more points than the red player and thus wins.
 	  </p>
 	</li>
+
+	<li>
+	  <h3>Payment</h3> 
+	  <p>
+You will be compensated according to your performance in this study. For completing the task, you are guaranteed the amount listed on the Mechanical Turk HIT that you've accepted, and, you will be paid an additional sum based on your performance in the game. You will be notified of the additional amount at the completion of the game. The more total points you earn during the games, the more money you will receive.
+
+	  </p>
  </ul>
 </div> 
 
