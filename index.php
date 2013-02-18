@@ -85,7 +85,7 @@
 				$check = $v;
 
 				if($check != $correct) {
-					die('<script>alert("You have answered an integrity question incorrectly. Please go back to the survey and read the directions carefully. Then, check your answers and try again to submit.");</script>');
+					die('<script>alert("You have answered an integrity question incorrectly. Please go back to the survey and read the directions carefully. Then, check your answers and try again to submit.");window.history.back(-1);</script>');
 
 				}
 			}
