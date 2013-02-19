@@ -136,11 +136,13 @@ function FlipItRenderEngine( renderSettings ) {
     }
 
     // Draw fog of war as long as the game is still running
-    if ( fogOfWar && ( ticks != numTicks ) ) {
-      var x = this.revealed;
-      var l = ticks - this.revealed;
-      drawRect( context, mapX(x), h - h/3, mapX(l), -h/6, "grey");
-      drawRect( context, mapX(x), h/3, mapX(l), h/6, "grey" );
+    if ( ( ticks != numTicks ) ) {
+		 if(fogOfWar) {
+			var x = this.revealed;
+			var l = ticks - this.revealed;
+			drawRect( context, mapX(x), h - h/3, mapX(l), -h/6, "grey");
+			drawRect( context, mapX(x), h/3, mapX(l), h/6, "grey" );
+		 }
     }
 
     drawHLine( context, mapX(ticks), h/3, h/3);
@@ -148,6 +150,26 @@ function FlipItRenderEngine( renderSettings ) {
     drawArrow( context, 0, h/2, w, h/2 );
     drawHLine( context, 3, h/3, h/3 )
   };
+
+	//this function fills in circules for the flips made at the 
+	//end of the game that you did not see
+  this.drawEnd = function(ticks, flips) {
+    var context = board[0].getContext("2d");
+    var w = board.width();
+    var h = board.height();
+
+    // maps ticks in the game state to x-coordines on the board
+    var mapX = function( tick ){
+        return (tick/numTicks) * ( w - rightMargin );
+    };   
+    for ( var tick = 0; tick < ticks; tick++ ) {
+      if ( tick in flips ) {
+        var x = mapX(tick);
+          if ( flips[tick] == "Y" ) drawCircle( context, yColor, circleSize, x, h/4); 
+          if ( flips[tick] == "X" ) drawCircle( context, xColor, circleSize,  x, 3*h/4); 
+     }         
+  }
+};
 }
 
 /**
@@ -169,7 +191,7 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
     output += " ";
     output += "<b><font color="+yColor+">Red:</font></b> "+yScore;
     output += " ";
-    output += "<b><font color='black'>Delta:</font></b> "+ (xScore - yScore);
+    output += "<b><font color='black'>&nbsp;&nbsp;&nbsp;&nbsp;Difference:</font></b> "+ (xScore - yScore);
 
     output += "</br>";
 

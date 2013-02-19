@@ -62,6 +62,7 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
       this.running = true;
 
       renderer.newBoard();
+		this.numTicks = numTicks;
 
       var self = this; //Save the current context
       this.clock = setInterval( function(){ self.tick( numTicks ); }, msPerTick);
@@ -74,8 +75,11 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
   this.endGame = function() {
     clearInterval( this.clock );
     this.running = false;
-	 Players.periodicPlayerTick = Math.floor((Math.random()*400)+100);
-	 Players.anchor = Math.floor((Math.random()*400));
+	 this.resetAnchorAndPPT();
+
+	 renderer.drawEnd(this.numTicks, this.flips);
+	 //renderer.drawBoard(this.numTicks, this.flips);
+
 
     if ( scoreBoardFunct != null ) scoreBoardFunct( this.xScore, this.yScore );
   };
@@ -139,9 +143,4 @@ var Players = {
   "randomPlayer":function( ticks ){ if(ticks % 79 == 0) return Math.random(ticks) < 0.3; },
 
   "periodicPlayer":function( ticks ){ var anchor = Players['anchor']; var ppt = Players['periodicPlayerTick']; if(ticks >= anchor && (((anchor - ticks) % ppt) == 0)) {return true;}return false; }
-//  ,"periodicPlayer": function (t) {return false;}
   };
-
-
-
-

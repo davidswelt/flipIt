@@ -15,6 +15,7 @@ class SurveyParts {
 		$demo = array('pre' => $demoPre, 'title' => 'Survey',
 		'data' => array(
 			'mturk_id' => array('label' => "What is your Mechanical Turk ID?"),
+			'hit_id' => array('label' => 'Which HIT did you accept to get here?'),
 			'age' => array('label' => 'What is your age (in years)?'),
 			'gender' => array('type' => 'radio', 'options' => array('Male', 'Female', 'Decline to answer')),
 			'education' => array('label' => 'What is the highest level of education that you have completed?', 'type' => 'radio', 'options' => array('Some high school', 'High school', 'Some college', 'Two year college degree', 'Four year college degree', 'Graduate or professional degree')),

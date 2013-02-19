@@ -42,9 +42,8 @@
 		unset($_REQUEST['action']);
 		unset($_REQUEST['prevPage']);
 
-		sanitizeParams(array('mturk_id','forceNewSession', 'prevPage','action'));
+		sanitizeParams(array('mturk_id','forceNewSession', 'prevPage','action', 'hit_id'));
       integrityCheck();
-
 
 		collapseScale('rps', 9);
 		collapseScale('nfc', 9);
@@ -70,7 +69,6 @@
 		$treatment_message = $treatment['message'];
 
 		if(!array_key_exists('session_id', $_COOKIE)) {
-		//if(array_key_exists('forceNewSession', $_REQUEST)) {
 			$db = db_connect();
 			$session_id = startGameSession($db, $mturk_id, $survey_blob, $treatment_id, false);
 			setcookie('session_id', $session_id);
@@ -88,6 +86,7 @@
 					die('<script>alert("You have answered an integrity question incorrectly. Please go back to the survey and read the directions carefully. Then, check your answers and try again to submit.");window.history.back(-1);</script>');
 
 				}
+				unset($_REQUEST[$k]);
 			}
 		}
 	}
@@ -186,7 +185,7 @@
 			var started = false;
 			var blueScores = [];
 			var redScores = [];
-			var endMsgDisplayed = 'N/A';
+			var endMsgDisplayed = 'No';
 			var firstTime = true;
 			window.game = game;
 
@@ -215,7 +214,6 @@
 					 if(flips != '') {
 						 replaceOppParams();
 
-						 //make it so this is only called once
 						 handleSessionChange(session_id);
 
 						 blueScores.push(game.xScore);
@@ -226,6 +224,9 @@
 						 $('#flash').css('visibility', 'visible');
 						 $('#flash').html(endMsg);
 						 $('#flash').css('text-align','center');
+						 endMsgDisplayed = 'Yes';
+					 }
+					 else {
 						 endMsgDisplayed = 'Yes';
 					 }
 
@@ -292,7 +293,7 @@
 		}   
 
 		function pluralize_stupid(num, word) {
-      	return (num > 1) ? word+'s': word;
+      	return (num != 1) ? word+'s': word;
 		}
 
 		function value_and_plural(num, word) {
@@ -313,16 +314,17 @@
             var infoString = '';
 
 				if(num_practice_runs_remaining > 0) {
-            	infoString = value_and_plural(num_practice_runs_remaining, 'practice run')+' left';
-					$('h1#title').html('FlipIt - Practice game');
+            	infoString = value_and_plural(num_practice_runs_remaining, 'practice round')+' left';
+					$('h1#title').html('Round for Practice');
 					$('h1#title').css('color', '#CC1100');
 				}
 				else {
-					$('h1#title').html('FlipIt - Real game');
+					$('h1#title').html('Round with Bonus Payment');
+					$('h1#title').css('color', '#000000');
 					if(num_practice_runs_remaining == 0) {
-               	alert('Each game you play from now on will be counted. Results of these games will affect your bonus payment. You must play '+value_and_plural(num_runs_remaining, 'more run')+' in order to be paid.');
+               	alert('Each round you play from now on will be counted. Results of these rounds will affect your bonus payment. You must play '+value_and_plural(num_runs_remaining, 'more round')+' in order to be paid.');
 					}
-					infoString = value_and_plural(num_runs_remaining, 'run')+' left, '+value_and_plural(session_stats['num_runs_played'],'run')+' played';
+					infoString = value_and_plural(num_runs_remaining, 'round')+' left, '+value_and_plural(session_stats['num_runs_played']-session_stats['NUM_PRACTICE_RUNS'],'round')+' played';
 				}
 
 				$('#statsBox').html(' ('+infoString+')');
@@ -344,7 +346,7 @@
 			}
 			msg += ' '+paystring;
 			
-			msg += ' You will also be paid the amount specified in the HIT that you accepted (if your session is found to be legitimate). Please copy this message for your records and close the window.</h1>';
+			msg += ' You will also be paid the amount specified in the HIT that you accepted. Please copy this message for your records and close the window.</h1>';
 			$('html').html(msg);
 			window.open('', '_self', '');
 //			window.close(); 

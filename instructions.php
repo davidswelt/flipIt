@@ -4,24 +4,16 @@
 You will be playing multiple rounds of a two-player game called FlipIt. The objective of FlipIt is to gain and maintain possession of the game board. 
 
 Until you take an action, the state of possession of the game board is hidden from your view. In this state, the board is shown in gray color. 
-
+                                                                   <br>
 The only action you have available is to 'flip' the game board. When you flip the board, it will be shown to you who had possession of the game board until this very moment. This information will only be shown to you and not your opponent. At the same time, you also gain possession of the board, or maintain possession if you already owned the board.
-
+                                                                   <br>
 The same rules apply to your opponent. That is, you cannot observe if and when the opponent flipped the board in the past, until you take the action to flip the board yourself.
-
+                                                                   <br>
 Below, we break down the rules in more detail.
 </li></ul>
 
  <h2>Detailed Rules</h2>
  <ul>
-	<li>
-	  <h3>How to Win</h3>
-	  <p>
-	  The object of the game is to win as many points as possible.
-	  To win you want to be in control for as long as possible using as few flips as possible.
-	  </p>
-	</li>
-	
 	<li>
 	  <h3>Points</h3>
 	  <p>
@@ -32,6 +24,8 @@ Below, we break down the rules in more detail.
 	  You pay <b>100</b> points when you play 'flip'.
 	  <br><br>
 	  You begin with <b>0</b> points. Scores are updated when you play a 'flip' and at the end of the game.
+	  <br>
+	  <br>
 	  </p>
 	</li>
 	
@@ -48,15 +42,14 @@ Below, we break down the rules in more detail.
 	<li>
 	  <h3>The Board</h3>
 	  <p>
-	  The board displays the current known information about the game.
+	  The board displays the current known information about the game, including your points, the points of the red player, and the difference between your points and the points of the red player.
 	  Each 'flip' played is marked with a dot.
 	  You can only see information that was revealed by your flips.
 	  Blue rectangles represent periods of time in which you, the blue player, had control. 
 	  Red rectangles represent periods of time in which the red player was in control.
-	  The score is given in the upper left hand corner.
 	  </p>
 
-	  <h2>An example game:</h2>
+	  <h2 style='position:relative;left:-40px'>An example game:</h2>
 	  <h4>The game in progress:</h4>
 	  <img src='images/midgame.png' width='800' />
 
@@ -89,17 +82,17 @@ Below, we break down the rules in more detail.
 			<i>9th second:</i> The blue player plays 'flip' and regains control. He maintains control for 4 seconds.
 		 </li>                                                          
 		 <li>
-			<i>12th second:</i> The red player plays 'flip' and regains control. He maintains control for the rest of the game.
+			<i>12th second:</i> The red player plays 'flip' and regains control. He maintains control for the rest of the game. He makes a number of flips in which he maintains control.
 		 </li>                                                          
 		 <li>
 			<i>20th second:</i> The game ends.
 		 </li>
 	  </ul>
 	  <p> 
-	  The blue player was in control for <b>8.05</b> seconds earning <b>805</b> points, and played 'flip' 3 times, costing <b>300</b> points. This gives him a total score of <b>500</b> points.
+	  The blue player was in control for <b>8.05</b> seconds earning <b>805</b> points, and played 'flip' 3 times, costing <b>300</b> points. This gives him a total score of <b>505</b> points.
 	  </p>
 	  <p>
-	  The blue player was in control for <b>6.95</b> seconds earning <b>695</b> points, and played 'flip' 4 times, costing <b>400</b> points. This gives him a total score of <b>295</b> points.
+	  The red player was in control for <b>11.95</b> seconds earning <b>1195</b> points, and played 'flip' 9 times, costing <b>900</b> points. This gives him a total score of <b>295</b> points.
 	  </p>
 	  <p>
 	  The blue player has more points than the red player and thus wins.
@@ -109,8 +102,10 @@ Below, we break down the rules in more detail.
 	<li>
 	  <h3>Payment</h3> 
 	  <p>
-You will be compensated according to your performance in this study. For completing the task, you are guaranteed the amount listed on the Mechanical Turk HIT that you've accepted, and, you will be paid an additional sum based on your performance in the game. You will be notified of the additional amount at the completion of the game. The more total points you earn during the games, the more money you will receive.
-
+You will be compensated according to your performance in this study. For completing the study, you are guaranteed the amount listed on the Mechanical Turk HIT that you have accepted, and you will be paid an additional sum based on your performance.<br> 
+You will participate in multiple rounds of the game. At first, you will participate in a practice round without a bonus payment to familiarize yourself with the interface. Then, you will participate in several additional rounds. You can receive a bonus payment for your performance in each of those rounds.<br>
+You can increase your bonus payment in a given round by performing well compared to the red player. If you lose by more than 1000 points, however, you will receive no bonus payment for that round.<br> 
+The exchange rate for points into the bonus payment is 1 cent for 100 points. For example, you would earn a bonus payment of 10 cents by gaining exactly as many points as the red player. If you outperform your opponent by 500 points you would earn 15 cents. If you underperform you opponent by 500 points you would earn 5 cents.<br> 
 	  </p>
  </ul>
 </div> 

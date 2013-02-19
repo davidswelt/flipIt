@@ -82,13 +82,17 @@ function getSessionStats($db, $session_id) {
 
 	$stats['num_runs_played'] = intval($count);
 
-  	if($stats['num_runs_played']) {
-   	$stats['bonus'] = getBonus($db, $session_id);
-	}
 	
 	$stats['session_id'] = intval($session_id);
 	$stats['num_runs_remaining'] = MAX_RUNS_PER_SESSION - $count;
 	$stats['num_practice_runs_remaining'] = NUM_PRACTICE_RUNS - $count;
+
+  	if($stats['num_runs_remaining'] == 0) {
+   	$stats['bonus'] = getBonus($db, $session_id);
+	}                                   
+
+	$stats['NUM_PRACTICE_RUNS'] = NUM_PRACTICE_RUNS;
+
 	logMessageAndDie(json_encode($stats));
 }
 
@@ -160,12 +164,16 @@ function getBonus($db, $session_id) {
    	return $data[0]['amount'];
 	}
 
-	$q = "SELECT session_id, run_id, blue_score, treatment_id, mturk_id FROM gameResult, gameRun, gameSession WHERE gameRun.id = gameResult.run_id AND gameRun.session_id = gameSession.id AND session_id=$session_id";	
+	$q = "SELECT blue_score, red_score, treatment_id, survey_blob FROM gameResult, gameRun, gameSession WHERE gameRun.id = gameResult.run_id AND gameRun.session_id = gameSession.id AND session_id=$session_id";	
 	$data = runQuery($db, $q);
+
+	if(!$data) {
+   	return 'NULL';
+	}
 
 	$total_delta = 0;
 	$deltas = array();
-
+	
    for($i=0;$i<count($data);$i++) {
 		//don't include score from practice rounds
 		if($i<NUM_PRACTICE_RUNS) {
@@ -178,30 +186,37 @@ function getBonus($db, $session_id) {
 		$bs = $bs[count($bs)-1];
 
 		$rs = json_decode($row['red_score']);
-		$rs = $bs[count($rs)-1];
+		$rs = $rs[count($rs)-1];
 
-		$deltas[] = $bs-$rs;
+		array_push($deltas, $bs-$rs);
 	}
-
+   
 	$deltas = array_map(function($a) {
-		return max(0, $a);
+		return max(0, 1000+$a);
 	}, $deltas);
+   
 
-	$total_delta = array_reduce($deltas, function($total, $item) {
-   	$total += $item;
-	}, 0);
+	foreach($deltas as $delta) {
+   	$total_delta += $delta;
+	}
 
 	$bonus = $total_delta * POINTS_EXCHANGE_RATE; 
 	$bonus = max(0, $bonus);
 	$bonus = sprintf("$%0.2f", $bonus);
 
-	recordbonus($db, $bonus, $mturk_id, $session_id, $data[0]['treatment_id']);
+	$json_blob = $data[0]['survey_blob'];
+	$json_blob = json_decode($json_blob, true);
+
+	$hit_id = $json_blob['hit_id'];
+	$mturk_id = $json_blob['mturk_id'];
+
+	recordbonus($db, $mturk_id, $hit_id, $bonus, $session_id, $data[0]['treatment_id']);
 
 	return $bonus;
 }
 
-function recordbonus($db, $bonus, $mturk_id, $session_id) {
-	$q = "INSERT INTO bonus (mturk_id, amount, session_id, finished) VALUES ('$mturk_id', '$bonus', $session_id, now())";
+function recordbonus($db, $mturk_id, $hit_id, $bonus, $session_id, $treatment_id) {
+	$q = "INSERT INTO bonus (mturk_id, hit_id, amount, session_id, treatment_id, finished) VALUES ('$mturk_id', '$hit_id', '$bonus', $session_id, $treatment_id, now())";
 
 	runQuery($db, $q, false);
 }
