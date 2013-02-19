@@ -206,15 +206,10 @@
 
 					 flips = getCleanFlipString(game.flips);
 					 
-					 if(firstTime) {
-                	handleSessionChange(session_id);
-						firstTime = false;
-					 }
 
 					 if(flips != '') {
 						 replaceOppParams();
 
-						 handleSessionChange(session_id);
 
 						 blueScores.push(game.xScore);
 						 redScores.push(game.yScore);
@@ -225,11 +220,17 @@
 						 $('#flash').html(endMsg);
 						 $('#flash').css('text-align','center');
 						 endMsgDisplayed = 'Yes';
+						 handleSessionChange(session_id);
 					 }
 					 else {
+						 replaceOppParams();
 						 endMsgDisplayed = 'Yes';
 					 }
-
+                
+					 if(firstTime) {
+                	handleSessionChange(session_id);
+						firstTime = false;
+					 }  
 					 blueScores = [];
 					 redScores = [];
 				  }
@@ -270,7 +271,7 @@
 		  game.resetAnchorAndPPT();
 
 		  replaceOppParams.msPerTickSlow = msPerTickSlow;
-		  replaceOppParams();
+		  //replaceOppParams();
       });
 		  
 		function replaceOppParams() {
@@ -341,12 +342,13 @@
 			
 			var paystring = 'Your performance did not warrant any bonus payments.';
 			
+			console.log(bonus);
 			if(bonus && bonus != '$0.00') {
 				paystring = 'You will be paid an additional '+bonus+' based on your performance.';
 			}
 			msg += ' '+paystring;
 			
-			msg += ' You will also be paid the amount specified in the HIT that you accepted. Please copy this message for your records and close the window.</h1>';
+			msg += ' You will be paid the amount specified in the HIT that you accepted. Please copy this message for your records and close the window.</h1>';
 			$('html').html(msg);
 			window.open('', '_self', '');
 //			window.close(); 

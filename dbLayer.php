@@ -158,11 +158,6 @@ function startGameRun($db, $session_id, $tick, $anchor) {
 }
 
 function getBonus($db, $session_id) {
-	$q = "SELECT amount FROM bonus WHERE session_id=$session_id";
-   $data = runQuery($db, $q);
-	if(count($data) > 0) {
-   	return $data[0]['amount'];
-	}
 
 	$q = "SELECT blue_score, red_score, treatment_id, survey_blob FROM gameResult, gameRun, gameSession WHERE gameRun.id = gameResult.run_id AND gameRun.session_id = gameSession.id AND session_id=$session_id";	
 	$data = runQuery($db, $q);
@@ -190,19 +185,29 @@ function getBonus($db, $session_id) {
 
 		array_push($deltas, $bs-$rs);
 	}
+	//print_r($deltas);
+	//print "<br>\n";
    
 	$deltas = array_map(function($a) {
 		return max(0, 1000+$a);
 	}, $deltas);
+	//print_r($deltas);
+	//print "<br>\n";
+
    
 
 	foreach($deltas as $delta) {
    	$total_delta += $delta;
 	}
 
+	//print "total : $total_delta\n<br>";
+
 	$bonus = $total_delta * POINTS_EXCHANGE_RATE; 
 	$bonus = max(0, $bonus);
 	$bonus = sprintf("$%0.2f", $bonus);
+
+	//print "bonus: $bonus\n<br>";
+	//die;
 
 	$json_blob = $data[0]['survey_blob'];
 	$json_blob = json_decode($json_blob, true);
@@ -216,6 +221,9 @@ function getBonus($db, $session_id) {
 }
 
 function recordbonus($db, $mturk_id, $hit_id, $bonus, $session_id, $treatment_id) {
+	$q = "DELETE FROM bonus WHERE session_id=$session_id";
+   $data = runQuery($db, $q, false);
+
 	$q = "INSERT INTO bonus (mturk_id, hit_id, amount, session_id, treatment_id, finished) VALUES ('$mturk_id', '$hit_id', '$bonus', $session_id, $treatment_id, now())";
 
 	runQuery($db, $q, false);
