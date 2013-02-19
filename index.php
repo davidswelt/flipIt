@@ -1,11 +1,17 @@
-<?php require_once(dirname(__FILE__).'/die_if_ie_under_9.php'); ?>
 
 <!DOCTYPE html>
 <html>
-  <head>
-<?php
+  <head>  
+  
+<?php 
 
-	if(array_key_exists('session_id', $_COOKIE) ||
+	include_once(dirname(__FILE__).'/die_if_ie_under_9.php'); 
+	include_once(dirname(__FILE__).'/config/config.php');
+
+	global $sid_string;
+   $sid_string = 'session_id'.COOKIE_NUM;
+
+	if(array_key_exists($sid_string, $_COOKIE) ||
 		$_REQUEST['prevPage'] == 'survey') {
 		processSurveyAndCreateSession();
 	}
@@ -58,21 +64,21 @@
 	
 	function createNewSession($db, $survey_blob) {
 		$treatment = getNewTreatment($db, true);
+		global $treatment_message, $sid_string;
 
-		if(array_key_exists('session_id', $_COOKIE)) {
-			$treatment = getOldTreatment($db, intval($_COOKIE['session_id']));
+		if(array_key_exists($sid_string, $_COOKIE)) {
+			$treatment = getOldTreatment($db, intval($_COOKIE[$sid_string]));
 		}
 
 
 		$treatment_id = $treatment['id'];
-		global $treatment_message;
 		$treatment_message = $treatment['message'];
 
-		if(!array_key_exists('session_id', $_COOKIE)) {
+		if(!array_key_exists($sid_string, $_COOKIE)) {
 			$db = db_connect();
 			$session_id = startGameSession($db, $mturk_id, $survey_blob, $treatment_id, false);
-			setcookie('session_id', $session_id);
-			return $session_id;
+			setcookie($sid_string, $session_id);
+			return $session_id;  
 		}
 	}
 
@@ -83,7 +89,7 @@
 				$check = $v;
 
 				if($check != $correct) {
-					die('<script>alert("You have answered an integrity question incorrectly. Please go back to the survey and read the directions carefully. Then, check your answers and try again to submit.");window.history.back(-1);</script>');
+					die('<script>alert("You have answered an integrity question incorrectly. Please go back to the survey and read the directions carefully. Then, check your answers and re-submit.");window.history.back(-1);</script>');
 
 				}
 				unset($_REQUEST[$k]);
@@ -140,7 +146,7 @@
 		}      
 
 		function getSession() {
-			var session_id = $.cookie('session_id');
+			var session_id = $.cookie('<?php global $sid_string;echo $sid_string ?>');
 
 			return session_id;
 		}
@@ -336,20 +342,24 @@
 		}
 
 		function handleSessionEnd(bonus) {
-			$('body').hide();
+			//$('body').hide();
 
-			var msg = '<h1 style="text-align:center;margin: 50px 50px 50px 50px">Thank you for finishing all rounds.'; 
+			var msg = '<div style="border-style:solid;background-color:grey;position:absolute;left:20px;top:300px;z-index:100"><h1 style="text-align:center;margin: 50px 50px 50px 50px">Thank you for finishing all rounds.'; 
 			
 			var paystring = 'Your performance did not warrant any bonus payments.';
 			
-			console.log(bonus);
 			if(bonus && bonus != '$0.00') {
 				paystring = 'You will be paid an additional '+bonus+' based on your performance.';
 			}
 			msg += ' '+paystring;
 			
-			msg += ' You will be paid the amount specified in the HIT that you accepted. Please copy this message for your records and close the window.</h1>';
-			$('html').html(msg);
+			msg += ' You will be paid the amount specified in the HIT that you accepted. Please copy this message for your records and close the window.</h1></div>';
+
+         elem = '<div style="z-index:0;position:absolute;left:-100px;top:-100px;width:10000px;height:10000px;background-color:gray;opacity:0.8;filter:alpha(opacity=80);"></div>';
+			$('body').css('z-index', '-100');
+
+			$('body').prepend($(msg));
+			$('body').prepend($(elem));
 			window.open('', '_self', '');
 //			window.close(); 
 		}
