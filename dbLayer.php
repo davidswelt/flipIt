@@ -9,10 +9,6 @@ function init() {
 	$action = $_REQUEST['action'];
 
 	switch($action) {
-		case 'startGameSession':
-			startGameSession($db, getKeyIfPresent('mturk_id'));
-		break;
-
 		case 'startGameRun':
 			startGameRun($db, getKeyIfPresent('session_id'),getKeyIfPresent('tick'), getKeyIfPresent('anchor'));
 		break;
@@ -23,10 +19,6 @@ function init() {
 
 		case 'getSessionStats':
 			getSessionStats($db, getKeyIfPresent('session_id'));
-		break;
-
-		case 'getMTurkId':
-			getMTurkId($db, getKeyIfPresent('session_id'));
 		break;
 
 		case '':
@@ -48,11 +40,16 @@ function getOldTreatment($db, $session_id) {
 	return $data[0];
 }           
 
-function getMTurkId($db, $session_id) {
-	$q = "SELECT survey_blob FROM gameSession WHERE gameSession.id = $session_id";
+function getMTurkIdFromDb($db, $session_id) {
+	$q = "SELECT mturk_id FROM gameSession WHERE gameSession.id = $session_id";
 
 	$data = runQuery($db, $q);
-   $blob = $data[0]['survey_blob'];
+   $mturk_id = $data[0]['mturk_id'];
+
+	return $mturk_id;
+}
+
+function getMTurkIdFromBlob($blob) {
 	$blob = json_decode($blob, true);
 
 	return $blob['mturk_id'];

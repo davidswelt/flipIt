@@ -10,7 +10,7 @@
 
 	global $sid_string;
    $sid_string = 'session_id'.COOKIE_NUM;
-	
+
 	rejectIfRepeat();
 
 	if(array_key_exists('hit_id', $_REQUEST)) {
@@ -57,7 +57,7 @@
 		require_once(dirname(__FILE__).'/dbLayer.php');
 		unset($_REQUEST['action']);
 		unset($_REQUEST['prevPage']);
-
+          
 		sanitizeParams(array('mturk_id','forceNewSession', 'prevPage','action', 'hit_id'));
       integrityCheck();
 
@@ -85,8 +85,7 @@
 			include_once(dirname(__FILE__).'/dbLayer.php');
 			$db = db_connect();
 			
-
-			$mturk_id = getMTurkId($db, $_COOKIE[$sid_string]);
+			$mturk_id = getMTurkIdFromDb($db, $_COOKIE[$sid_string]);
 			rejectIfRepeatMturkID($mturk_id);
 		}
 	}
@@ -119,9 +118,10 @@
 
 		$treatment_id = $treatment['id'];
 		$treatment_message = $treatment['message'];
-
+			
 		if(!array_key_exists($sid_string, $_COOKIE)) {
 			$db = db_connect();
+			$mturk_id = getMTurkIdFromBlob($survey_blob);
 			$session_id = startGameSession($db, $mturk_id, $survey_blob, $treatment_id, false);
 			setcookie($sid_string, $session_id);
 			return $session_id;  
