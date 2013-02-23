@@ -15,7 +15,7 @@ class SurveyParts {
 		$demo = array('pre' => $demoPre, 'title' => 'Survey',
 		'data' => array(
 			'mturk_id' => array('label' => "What is your Mechanical Turk ID?"),
-			'hit_id' => array('label' => 'Which HIT did you accept to get here?'),
+			'hit_id' => array('label' => 'Which HIT did you accept to get here?', 'type'=>'hidden'),
 			'age' => array('label' => 'What is your age (in years)?'),
 			'gender' => array('type' => 'radio', 'options' => array('Male', 'Female', 'Decline to answer')),
 			'education' => array('label' => 'What is the highest level of education that you have completed?', 'type' => 'radio', 'options' => array('Some high school', 'High school', 'Some college', 'Two year college degree', 'Four year college degree', 'Graduate or professional degree')),
@@ -91,8 +91,9 @@ class SurveyParts {
 				$details['label'] = "What is your $param?";
 			}
 
-			$result .= "<li><label for='$param'>".$details['label']."</label>";
-
+			if($details['type'] !='hidden')
+				$result .= "<li><label for='$param'>".$details['label']."</label>";
+			
 			if($details['type'] == 'likert') {
 				if(!array_key_exists('left', $details)) {
 					$details['left'] = 'totally disagree';
@@ -123,9 +124,11 @@ class SurveyParts {
 				$result .= '</ul></li>';
 			}
 			else {
-				$result .= "<input name='$param' id='$param' type='".$details['type']."' value='".$details['value']."'></li>\n";
+				$result .= "<input name='$param' id='$param' type='".$details['type']."' value='".$details['value']."'>\n";
+				if($details['type'] != 'hidden') {
+					$result .= '</li>';
+				}
 			}
-			
 		}
 		$result .= '</ul></fieldset><hr>';
 

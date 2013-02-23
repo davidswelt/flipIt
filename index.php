@@ -10,6 +10,14 @@
 
 	global $sid_string;
    $sid_string = 'session_id'.COOKIE_NUM;
+	
+	rejectIfRepeat();
+
+	if(array_key_exists('hit_id', $_REQUEST)) {
+		$hit_id = $_REQUEST['hit_id'];
+		$hit_id = preg_replace('/[^a-zA-Z0-9 ]/','', $hit_id);
+		setcookie('hit_id', $hit_id);
+	}                              
 
 	if(array_key_exists($sid_string, $_COOKIE) ||
 		$_REQUEST['prevPage'] == 'survey') {
@@ -30,6 +38,8 @@
 	}
 
 	function displayConsent() {
+		//maybe here set a cookie for hit id and grab it back later to put into the survey, since clearly people do not understand what that is. same with mturk id?
+
 		include('consentForm.php');
 		die;
 	}
@@ -54,12 +64,49 @@
 		collapseScale('rps', 9);
 		collapseScale('nfc', 9);
 		ksort($_REQUEST);
+		
 		$survey_blob = json_encode($_REQUEST);
 
 		//get treatment stuff here
 		//save it and use it later
 		$db = db_connect();
 		createNewSession($db, $survey_blob);
+	}
+
+	function rejectIfRepeat() {
+		if(array_key_exists('mturk_id', $_REQUEST)) {
+			rejectIfRepeatMturkID($_REQUEST['mturk_id']);
+		}
+
+		global $sid_string;
+
+		if(array_key_exists($sid_string, $_COOKIE)) {
+			$_REQUEST['action'] = 'connect';
+			include_once(dirname(__FILE__).'/dbLayer.php');
+			$db = db_connect();
+			
+
+			$mturk_id = getMTurkId($db, $_COOKIE[$sid_string]);
+			rejectIfRepeatMturkID($mturk_id);
+		}
+	}
+
+
+	function rejectIfRepeatMturkID($mturk_id) {
+		$record_file = dirname(__FILE__).'/review/affected.csv';
+		$repeat_mturk_ids = file_get_contents($record_file);
+		$repeat_mturk_ids = explode(',', $repeat_mturk_ids);
+		$repeat_mturk_ids = array_unique($repeat_mturk_ids);
+
+		if(!$mturk_id || in_array($mturk_id, $repeat_mturk_ids)) {
+			?>
+			<p>
+			Our records indicate that a user with the entered Mechanical Turk ID has already completed this experiment. Users cannot complete the experiment more than once. We are sorry for the inconvenience.
+         </p>
+			<?php
+
+         die;
+		}
 	}
 	
 	function createNewSession($db, $survey_blob) {
@@ -69,7 +116,6 @@
 		if(array_key_exists($sid_string, $_COOKIE)) {
 			$treatment = getOldTreatment($db, intval($_COOKIE[$sid_string]));
 		}
-
 
 		$treatment_id = $treatment['id'];
 		$treatment_message = $treatment['message'];
@@ -380,7 +426,7 @@
 	 <br>
 
     <button id="startBtn">Start</button> to play as the blue player<span id='statsBox'></span>
-    <br><button id="flipBtn">Flip</button> to flip.
+    <br><button id="flipBtn" style='width:75px;height:50px'>Flip</button> to flip.
 
     <br><br>
 

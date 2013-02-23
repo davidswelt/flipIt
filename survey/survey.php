@@ -2,6 +2,7 @@
 <link rel="stylesheet" type="text/css" href="css/surveyStyle.css">
 <script src="//code.jquery.com/jquery-latest.js"></script>
 <script type="text/javascript" src="js/jquery.validate.js"></script>
+<script type="text/javascript" src="/flipIt/js/jquery.cookie.js"></script>
 
 <script>
 $(document).ready(function(){
@@ -14,6 +15,9 @@ $(document).ready(function(){
 			errorMsgTop.html('<br><span style="color:#AA0000">Questions in red are required and have not been filled out. Please fill in these questions.</span>');
 		}
 	});
+
+	var val = $.cookie('hit_id');
+	$('#hit_id').val(val);
 });
 </script>               
 </head>

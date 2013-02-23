@@ -25,6 +25,10 @@ function init() {
 			getSessionStats($db, getKeyIfPresent('session_id'));
 		break;
 
+		case 'getMTurkId':
+			getMTurkId($db, getKeyIfPresent('session_id'));
+		break;
+
 		case '':
 			logMessageAndDie("No action provided!");
 
@@ -35,17 +39,27 @@ function init() {
 
 	}
 }
-
+           
 function getOldTreatment($db, $session_id) {
 	$q = "SELECT treatment_id as id, opponent_description as message FROM gameSession, treatment WHERE treatment.id = treatment_id AND gameSession.id = $session_id";
 
 	$data = runQuery($db, $q);
 
 	return $data[0];
+}           
+
+function getMTurkId($db, $session_id) {
+	$q = "SELECT survey_blob FROM gameSession WHERE gameSession.id = $session_id";
+
+	$data = runQuery($db, $q);
+   $blob = $data[0]['survey_blob'];
+	$blob = json_decode($blob, true);
+
+	return $blob['mturk_id'];
 }
 
 function getNewTreatment($db, $balanced = true) {
-	$q = "SELECT treatment.id, count(treatment_id) as count, opponent_description as message FROM treatment LEFT JOIN gameSession on treatment.id = treatment_id GROUP by treatment.id ORDER BY count(treatment_id) ASC";
+	$q = "SELECT treatment.id, count(treatment_id) as count, opponent_description as message FROM treatment LEFT JOIN gameSession ON treatment.id = treatment_id WHERE treatment.active=1 GROUP by treatment.id ORDER BY count(treatment_id) ASC";
 	$data = runQuery($db, $q);
 
 	if($balanced) {
@@ -124,7 +138,7 @@ function sanitizeParams($allInts = false) {
 				}
 			}
 			else {
-				$id = preg_replace('/[^a-zA-Z0-9 \s]/','', $id);
+				$id = preg_replace('/[^a-zA-Z0-9 ]/','', $id);
 			}
 		}
 
@@ -185,14 +199,10 @@ function getBonus($db, $session_id) {
 
 		array_push($deltas, $bs-$rs);
 	}
-	//print_r($deltas);
-	//print "<br>\n";
    
 	$deltas = array_map(function($a) {
 		return max(0, 1000+$a);
 	}, $deltas);
-	//print_r($deltas);
-	//print "<br>\n";
 
    
 
@@ -200,14 +210,9 @@ function getBonus($db, $session_id) {
    	$total_delta += $delta;
 	}
 
-	//print "total : $total_delta\n<br>";
-
 	$bonus = $total_delta * POINTS_EXCHANGE_RATE; 
 	$bonus = max(0, $bonus);
 	$bonus = sprintf("$%0.2f", $bonus);
-
-	//print "bonus: $bonus\n<br>";
-	//die;
 
 	$json_blob = $data[0]['survey_blob'];
 	$json_blob = json_decode($json_blob, true);
