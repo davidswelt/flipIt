@@ -67,7 +67,7 @@
 		
 		$survey_blob = json_encode($_REQUEST);
 
-		//get treatment stuff here
+		//get info_treatment stuff here
 		//save it and use it later
 		$db = db_connect();
 		createNewSession($db, $survey_blob);
@@ -109,20 +109,24 @@
 	}
 	
 	function createNewSession($db, $survey_blob) {
-		$treatment = getNewTreatment($db, true);
-		global $treatment_message, $sid_string;
+		$info_treatment = getNewTreatment($db, 'info', true);
+		$visual_treatment = getNewTreatment($db, 'visual', true);
+		global $info_treatment_message, $sid_string;
 
 		if(array_key_exists($sid_string, $_COOKIE)) {
-			$treatment = getOldTreatment($db, intval($_COOKIE[$sid_string]));
+			$info_treatment = getOldTreatment($db, 'info', intval($_COOKIE[$sid_string]));
+			$visual_treatment = getOldTreatment($db, 'visual', intval($_COOKIE[$sid_string]));
 		}
 
-		$treatment_id = $treatment['id'];
-		$treatment_message = $treatment['message'];
+		$info_treatment_id = $info_treatment['id'];
+		$info_treatment_message = $info_treatment['opponent_description'];
+
+		$visual_treatment_id = $visual_treatment['id'];
 			
 		if(!array_key_exists($sid_string, $_COOKIE)) {
 			$db = db_connect();
 			$mturk_id = getMTurkIdFromBlob($survey_blob);
-			$session_id = startGameSession($db, $mturk_id, $survey_blob, $treatment_id, false);
+			$session_id = startGameSession($db, $mturk_id, $survey_blob, $info_treatment_id, $visual_treatment_id, false);
 			setcookie($sid_string, $session_id);
 			return $session_id;  
 		}
@@ -438,7 +442,7 @@
 	 <h3>Important information about your opponent:</h3>
 	 <p id='opponent_description'>
 	 <?php
-	 echo $treatment_message;
+	 echo $info_treatment_message;
 	 ?>
 	 </p>
 

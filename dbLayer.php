@@ -32,8 +32,17 @@ function init() {
 	}
 }
            
-function getOldTreatment($db, $session_id) {
-	$q = "SELECT treatment_id as id, opponent_description as message FROM gameSession, treatment WHERE treatment.id = treatment_id AND gameSession.id = $session_id";
+function getOldTreatment($db, $treatment_type, $session_id) {
+	$tt = $treatment_type . "_treatment";
+	$field = '';
+   if($treatment_type == 'info') {
+   	$field = 'opponent_description';
+	}
+	else if($treatment_type == 'visual') {
+   	$field = 'feedback_type';
+	}
+ 
+	$q = "SELECT $tt"."_id as id, $field FROM gameSession, $tt WHERE $tt.id = $tt"."_id AND gameSession.id = $session_id";
 
 	$data = runQuery($db, $q);
 
@@ -55,8 +64,17 @@ function getMTurkIdFromBlob($blob) {
 	return $blob['mturk_id'];
 }
 
-function getNewTreatment($db, $balanced = true) {
-	$q = "SELECT treatment.id, count(treatment_id) as count, opponent_description as message FROM treatment LEFT JOIN gameSession ON treatment.id = treatment_id WHERE treatment.active=1 GROUP by treatment.id ORDER BY count(treatment_id) ASC";
+function getNewTreatment($db, $treatment_type, $balanced = true) {
+	$tt = $treatment_type . "_treatment";
+	$field = '';
+   if($treatment_type == 'info') {
+   	$field = 'opponent_description';
+	}
+	else if($treatment_type == 'visual') {
+   	$field = 'feedback_type';
+	}
+
+	$q = "SELECT $tt.id, $field, count($tt"."_id) as count FROM $tt LEFT JOIN gameSession ON $tt.id = $tt"."_id WHERE $tt.active=1 GROUP by $tt.id ORDER BY count($tt"."_id) ASC";
 	$data = runQuery($db, $q);
 
 	if($balanced) {
@@ -149,8 +167,8 @@ function sanitizeParams($allInts = false) {
 	}
 }
 
-function startGameSession($db, $mturk_id, $survey_blob, $treatment_id, $die = true) {
-	$q = "INSERT INTO gameSession (mturk_id, started, survey_blob, treatment_id) VALUES ('$mturk_id', now(), '$survey_blob', $treatment_id)";
+function startGameSession($db, $mturk_id, $survey_blob, $info_treatment_id, $visual_treatment_id, $die = true) {
+	$q = "INSERT INTO gameSession (mturk_id, started, survey_blob, info_treatment_id, visual_treatment_id) VALUES ('$mturk_id', now(), '$survey_blob', $info_treatment_id, $visual_treatment_id)";
 	runQuery($db, $q, false);
 	$session_id = getMostRecentSessionId($db, $mturk_id);
 
@@ -169,8 +187,7 @@ function startGameRun($db, $session_id, $tick, $anchor) {
 }
 
 function getBonus($db, $session_id) {
-
-	$q = "SELECT blue_score, red_score, treatment_id, survey_blob FROM gameResult, gameRun, gameSession WHERE gameRun.id = gameResult.run_id AND gameRun.session_id = gameSession.id AND session_id=$session_id";	
+	$q = "SELECT blue_score, red_score, info_treatment_id, visual_treatment_id, survey_blob FROM gameResult, gameRun, gameSession WHERE gameRun.id = gameResult.run_id AND gameRun.session_id = gameSession.id AND session_id=$session_id";	
 	$data = runQuery($db, $q);
 
 	if(!$data) {
@@ -217,16 +234,16 @@ function getBonus($db, $session_id) {
 	$hit_id = $json_blob['hit_id'];
 	$mturk_id = $json_blob['mturk_id'];
 
-	recordbonus($db, $mturk_id, $hit_id, $bonus, $session_id, $data[0]['treatment_id']);
+	recordbonus($db, $mturk_id, $hit_id, $bonus, $session_id, $data[0]['info_treatment_id'], $data[0]['visual_treatment_id']);
 
 	return $bonus;
 }
 
-function recordbonus($db, $mturk_id, $hit_id, $bonus, $session_id, $treatment_id) {
+function recordbonus($db, $mturk_id, $hit_id, $bonus, $session_id, $info_treatment_id, $visual_treatment_id) {
 	$q = "DELETE FROM bonus WHERE session_id=$session_id";
    $data = runQuery($db, $q, false);
 
-	$q = "INSERT INTO bonus (mturk_id, hit_id, amount, session_id, treatment_id, finished) VALUES ('$mturk_id', '$hit_id', '$bonus', $session_id, $treatment_id, now())";
+	$q = "INSERT INTO bonus (mturk_id, hit_id, amount, session_id, info_treatment_id, visual_treatment_id, finished) VALUES ('$mturk_id', '$hit_id', '$bonus', $session_id, $info_treatment_id, $visual_treatment_id, now())";
 
 	runQuery($db, $q, false);
 }
