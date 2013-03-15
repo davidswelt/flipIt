@@ -23,11 +23,12 @@
           flipHash[turn] = player;
         }
 
-
         var config = new RenderSettings( $("#gameBoard") ); 
+		  config.numTicks = 2000;
         var draw = new FlipItRenderEngine( config );
+
         draw.newBoard();
-        draw.drawBoard(1000, flipHash);
+        draw.drawBoard(2000, flipHash);
 
       });
     </script>

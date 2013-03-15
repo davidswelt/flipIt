@@ -135,8 +135,13 @@
 				$check = $v;
 
 				if($check != $correct) {
-					die('<script>alert("You have answered an integrity question incorrectly. Please go back to the survey and read the directions carefully. Then, check your answers and re-submit.");window.history.back(-1);</script>');
-
+					?>
+					<script>
+						alert("You have answered an integrity question incorrectly. Please go back to the survey and read the directions carefully. Then, check your answers and re-submit.");
+						window.history.back(-1);
+					</script>
+					<?php
+					die;
 				}
 				unset($_REQUEST[$k]);
 			}

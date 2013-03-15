@@ -22,7 +22,7 @@ class SurveyParts {
 			'country' => array('label' => 'What is your country of origin?', 'type' => 'radio', 'options' => array('United States', 'India', 'Canada', 'None of the above'))
 			));
 
-		$rpsPre = "Please indicate the extent to which you agree or disagree with the following statement by marking the curcular button of the option you prefer. Please do not think too long before answering; usually your first inclination is also the best one.";
+		$rpsPre = "Please indicate the extent to which you agree or disagree with the following statement by marking the circular button of the option you prefer. Please do not think too long before answering; usually your first inclination is also the best one.";
 		$rps = array('pre' => $rpsPre, 'title' => 'Self-assessment', 
 		 'data' => array(
 		 'rps1' => array('label' => 'Safety First.', 'type' => 'likert', 'size' => '9'),
