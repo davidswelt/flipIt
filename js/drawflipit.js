@@ -20,6 +20,7 @@ function RenderSettings( board ){
   this.player = "X";
   this.fogOfWar = false;
   this.rightMargin = 8;
+  this.feedback_type = 'FH';
 
 }
 
@@ -183,22 +184,32 @@ function FlipItRenderEngine( renderSettings ) {
  *
  */
 function ScoreBoard( scoreBoardElement, xColor, yColor ) {
+	this.update = function(xScore, yScore) { 
+		output = ""
 
-  this.update = function(xScore, yScore) { 
-    output = ""
+		if(window.feedback_type == 'FH' || window.is_practice) {
+			output += "<b><font color="+xColor+">Blue:</font></b> "+xScore;
+			output += " ";
+			output += "<b><font color="+yColor+">Red:</font></b> "+yScore;
+			output += " ";
+			output += "<b><font color='black'>&nbsp;&nbsp;&nbsp;&nbsp;Difference:</font></b> "+ (xScore - yScore);
+			output += "</br>";
+		}
+		else if(window.feedback_type == 'LM') {
+			output += "<div style='text-align:left;width:450px;margin-left:auto;margin-right:auto'><h1><b><font color="+xColor+">Your score:</font></b> "+xScore;
+			output += "<br> ";
+			output += "<b><font color="+yColor+">Opponent score:</font></b> "+yScore;
+			output += "<br> ";
+			output += "<b><font color='black'>Difference:</font></b> "+ (xScore - yScore);
+			output += "<br> ";
+			output += "<b><font color='black'>Time elapsed:</font></b> "+ (window.game.ticks*window.game.msPerTick/1000)+" secs";
 
-    output += "<b><font color="+xColor+">Blue:</font></b> "+xScore;
-    output += " ";
-    output += "<b><font color="+yColor+">Red:</font></b> "+yScore;
-    output += " ";
-    output += "<b><font color='black'>&nbsp;&nbsp;&nbsp;&nbsp;Difference:</font></b> "+ (xScore - yScore);
+			output += "</div></center>"; 
+		}
 
-    output += "</br>";
-
-    scoreBoardElement.html(output);
-  };
-};
-
+		scoreBoardElement.html(output);
+	};
+}
 
 /**
  * Canvas util functions

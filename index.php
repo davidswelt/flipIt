@@ -96,8 +96,8 @@
 		$repeat_mturk_ids = file_get_contents($record_file);
 		$repeat_mturk_ids = explode(',', $repeat_mturk_ids);
 		$repeat_mturk_ids = array_unique($repeat_mturk_ids);
-
-		if(!$mturk_id || in_array($mturk_id, $repeat_mturk_ids)) {
+               
+		if(in_array($mturk_id, $repeat_mturk_ids)) {
 			?>
 			<p>
 			Our records indicate that a user with the entered Mechanical Turk ID has already completed this experiment. Users cannot complete the experiment more than once. We are sorry for the inconvenience.
@@ -111,7 +111,7 @@
 	function createNewSession($db, $survey_blob) {
 		$info_treatment = getNewTreatment($db, 'info', true);
 		$visual_treatment = getNewTreatment($db, 'visual', true);
-		global $info_treatment_message, $sid_string;
+		global $info_treatment_message, $sid_string, $visual_treatment_feedback_type;
 
 		if(array_key_exists($sid_string, $_COOKIE)) {
 			$info_treatment = getOldTreatment($db, 'info', intval($_COOKIE[$sid_string]));
@@ -122,6 +122,7 @@
 		$info_treatment_message = $info_treatment['opponent_description'];
 
 		$visual_treatment_id = $visual_treatment['id'];
+		$visual_treatment_feedback_type = $visual_treatment['feedback_type'];
 			
 		if(!array_key_exists($sid_string, $_COOKIE)) {
 			$db = db_connect();
@@ -226,6 +227,7 @@
 				return;
 			}
 			var session_id = getSession();
+			handleSessionChange(session_id);
 
 			var msPerTickSlow = 10;
 			var numTicksLong = 2000;
@@ -234,12 +236,20 @@
 
 			config.fogOfWar = true;
 			config.numTicks = numTicksLong;
+			config.feedback_type = "<?php echo $visual_treatment_feedback_type; ?>";
+			window.feedback_type = config.feedback_type;
 
 			var gDraw = new FlipItRenderEngine( config );
-			var sb = new ScoreBoard( $("#scoreBoard"), config.xColor, config.yColor );        
+			var sb = new ScoreBoard( $("#scoreBoard"), config.xColor, config.yColor, config.feedback_type );        
 
 			var game = new FlipItGame( gDraw, Players["humanPlayer"], Players["periodicPlayer"], sb.update );
+			window.game = game;
 
+			if(window.feedback_type != 'FH') {
+				if(!window.is_practice) {
+					$('#gameBoard_FH').hide();
+				}
+			}          
 			game.newGame();
 			sb.update(0, 0);
 			var run_id = null;
@@ -251,6 +261,8 @@
 			window.game = game;
 
 		  setInterval(function() {
+
+
 			  if(game.running) {
                $('#startBtn').attr('disabled','disabled')
 					endMsgDisplayed = 'No';
@@ -281,7 +293,7 @@
 						 $('#flash').html(endMsg);
 						 $('#flash').css('text-align','center');
 						 endMsgDisplayed = 'Yes';
-						 handleSessionChange(session_id);
+						 handleSessionChange(session_id, true);
 					 }
 					 else {
 						 replaceOppParams();
@@ -289,7 +301,7 @@
 					 }
                 
 					 if(firstTime) {
-                	handleSessionChange(session_id);
+                	handleSessionChange(session_id, true);
 						firstTime = false;
 					 }  
 					 blueScores = [];
@@ -302,15 +314,21 @@
 
         //setup buttons
         $("#startBtn").click( function() {
-				  if(!game.running) {
-					  started = true;
-					  sb.update(0, 0);
-					  var myData = {action:'startGameRun','session_id':session_id, 'tick':Players.periodicPlayerTick, 'anchor': Players.anchor};
-					  run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
+				if(!game.running) {
+					started = true;
+					sb.update(0, 0);
+					var myData = {action:'startGameRun','session_id':session_id, 'tick':Players.periodicPlayerTick, 'anchor': Players.anchor};
+					run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
 
-						$('#flash').css('visibility', 'hidden');
+					$('#flash').css('visibility', 'hidden');
 
-					  game.start( msPerTickSlow, numTicksLong );
+					if(window.feedback_type != 'FH') {
+						if(!window.is_practice) {
+							$('#gameBoard_FH').hide();
+						}
+					}           
+
+					game.start( msPerTickSlow, numTicksLong );
 				}
         });
 
@@ -364,7 +382,7 @@
 
 		//handles changing from practice to normal
 		//and normal game state to session end
-		function handleSessionChange(session_id) {
+		function handleSessionChange(session_id, showAlert) {
 			var myData = {action:'getSessionStats','session_id':session_id}; 
 			var session_stats = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false});
 			session_stats = JSON.parse(session_stats.responseText);
@@ -377,14 +395,25 @@
 
 				if(num_practice_runs_remaining > 0) {
             	infoString = value_and_plural(num_practice_runs_remaining, 'practice round')+' left';
+					window.is_practice = true;
+
 					$('h1#title').html('Round for Practice');
 					$('h1#title').css('color', '#CC1100');
-				}
+
+ 				}
 				else {
+					window.is_practice = false;
+
 					$('h1#title').html('Round with Bonus Payment');
 					$('h1#title').css('color', '#000000');
 					if(num_practice_runs_remaining == 0) {
-               	alert('Each round you play from now on will be counted. Results of these rounds will affect your bonus payment. You must play '+value_and_plural(num_runs_remaining, 'more round')+' in order to be paid.');
+						var extra = '';
+						if(window.feedback_type == 'LM') {
+                  	extra = ' From now on, you will not see the game board. However, when you play \'flip\' you will be told if your flip is effective or not, when your opponent last moved, and what the current time is.';
+						}
+						if(showAlert) {
+							alert('Each round you play from now on will be counted. Results of these rounds will affect your bonus payment. You must play '+value_and_plural(num_runs_remaining, 'more round')+' in order to be paid.'+extra);
+						}
 					}
 					infoString = value_and_plural(num_runs_remaining, 'round')+' left, '+value_and_plural(session_stats['num_runs_played']-session_stats['NUM_PRACTICE_RUNS'],'round')+' played';
 				}
@@ -397,8 +426,6 @@
 		}
 
 		function handleSessionEnd(bonus) {
-			//$('body').hide();
-
 			var msg = '<div style="border-style:solid;background-color:grey;position:absolute;left:20px;top:300px;z-index:100"><h1 style="text-align:center;margin: 50px 50px 50px 50px">Thank you for finishing all rounds.'; 
 			
 			var paystring = 'Your performance did not warrant any bonus payments.';
@@ -429,10 +456,14 @@
     </div>
 	  <div id='flash'></div>
 
-    <div id="scoreBoard"></div>
-    
-    <canvas id="gameBoard" width="800" height="150"></canvas>
-	 <br>
+	 <div id='scoreAndGameBoards'>
+		 <div id="scoreBoard"></div>
+		 <div id='gameBoard_FH'>
+			 <canvas id="gameBoard" width="800" height="150"></canvas>
+		 </div>
+		 </div>
+		 <br>
+	 </div>
 
     <button id="startBtn">Start</button> to play as the blue player<span id='statsBox'></span>
     <br><button id="flipBtn" style='width:75px;height:50px'>Flip</button> to flip.

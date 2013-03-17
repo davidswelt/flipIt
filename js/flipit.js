@@ -36,6 +36,7 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
     this.running = false;
     
     this.ticks = 0;
+    this.msPerTick = 0;
     this.control = "X";
     this.flips = [];
 
@@ -63,6 +64,7 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 
       renderer.newBoard();
 		this.numTicks = numTicks;
+		this.msPerTick = msPerTick;
 
       var self = this; //Save the current context
       this.clock = setInterval( function(){ self.tick( numTicks ); }, msPerTick);
