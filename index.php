@@ -113,7 +113,13 @@
 		$visual_treatment = getNewTreatment($db, 'visual', true);
 		global $info_treatment_message, $sid_string, $visual_treatment_feedback_type;
 
+		$valid_session = false;
 		if(array_key_exists($sid_string, $_COOKIE)) {
+			$valid_session = isValidSession($db, $_COOKIE[$sid_string]);
+		}
+
+
+		if($valid_session) {
 			$info_treatment = getOldTreatment($db, 'info', intval($_COOKIE[$sid_string]));
 			$visual_treatment = getOldTreatment($db, 'visual', intval($_COOKIE[$sid_string]));
 		}
@@ -124,7 +130,7 @@
 		$visual_treatment_id = $visual_treatment['id'];
 		$visual_treatment_feedback_type = $visual_treatment['feedback_type'];
 			
-		if(!array_key_exists($sid_string, $_COOKIE)) {
+		if(!$valid_session) {
 			$db = db_connect();
 			$mturk_id = getMTurkIdFromBlob($survey_blob);
 			$session_id = startGameSession($db, $mturk_id, $survey_blob, $info_treatment_id, $visual_treatment_id, false);
@@ -246,9 +252,7 @@
 			window.game = game;
 
 			if(window.feedback_type != 'FH') {
-				if(!window.is_practice) {
-					$('#gameBoard_FH').hide();
-				}
+				$('#gameBoard_FH').hide();
 			}          
 			game.newGame();
 			sb.update(0, 0);
@@ -315,20 +319,35 @@
         //setup buttons
         $("#startBtn").click( function() {
 				if(!game.running) {
-					started = true;
-					sb.update(0, 0);
-					var myData = {action:'startGameRun','session_id':session_id, 'tick':Players.periodicPlayerTick, 'anchor': Players.anchor};
-					run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
+					setTimeout(function() { 
+						$('#countdown').append('<h4 style="display:inline">Game will start in 3</h4>...'); 
+						setTimeout(function() { 
+							$('#countdown').append('<h3 style="display:inline">2</h3>...');
+							setTimeout(function() { 
+								$('#countdown').append('<h2 style="display:inline">1</h2>...');
+								setTimeout(function() { 
+									startGameAfterCount();
+								}, 1000);  
+							}, 1000);
+						}, 1000);
+					}, 1);
 
-					$('#flash').css('visibility', 'hidden');
+					function startGameAfterCount() {
 
-					if(window.feedback_type != 'FH') {
-						if(!window.is_practice) {
+						started = true;
+						sb.update(0, 0);
+						var myData = {action:'startGameRun','session_id':session_id, 'tick':Players.periodicPlayerTick, 'anchor': Players.anchor};
+						run_id = $.ajax({type:'GET', url:'dbLayer.php', data:myData, async:false}).responseText;
+
+						$('#flash').css('visibility', 'hidden');
+
+						if(window.feedback_type != 'FH') {
 							$('#gameBoard_FH').hide();
-						}
-					}           
+						}           
 
-					game.start( msPerTickSlow, numTicksLong );
+                  $('#countdown').html('The game is now running');
+						game.start( msPerTickSlow, numTicksLong );
+					}
 				}
         });
 
@@ -350,7 +369,6 @@
 		  game.resetAnchorAndPPT();
 
 		  replaceOppParams.msPerTickSlow = msPerTickSlow;
-		  //replaceOppParams();
       });
 		  
 		function replaceOppParams() {
@@ -456,14 +474,16 @@
     </div>
 	  <div id='flash'></div>
 
-	 <div id='scoreAndGameBoards'>
-		 <div id="scoreBoard"></div>
-		 <div id='gameBoard_FH'>
-			 <canvas id="gameBoard" width="800" height="150"></canvas>
-		 </div>
-		 </div>
-		 <br>
+	 <div id="scoreBoard"></div>
+	 <br>
+	 <div id='gameBoard_LM'>
+		 <canvas id="gameBoard_LM_canvas" width="800" height="100"></canvas>
+	 </div>    
+	 <div id='gameBoard_FH'>
+		 <canvas id="gameBoard" width="800" height="150"></canvas>
 	 </div>
+	 </div>
+	 <br>
 
     <button id="startBtn">Start</button> to play as the blue player<span id='statsBox'></span>
     <br><button id="flipBtn" style='width:75px;height:50px'>Flip</button> to flip.
@@ -505,7 +525,7 @@
   <p>
   This implementation of flipIt was written in javascript and HTML by <a href="http://github.com/EthanHeilman">Ethan Heilman</a>.
   This version was adapted by <a href='http://www.alannochenson.com'>Alan Nochenson.</a>
-  For the source code and further documentation please visit <a href="https://github.com/EthanHeilman/flipIt">flipIt on github</a>.
+  For the source code and further documentation please visit <a href="https://github.com/anochens/flipIt">flipIt on github</a>.
   </p>
   </div>
   </body>

@@ -187,7 +187,7 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 	this.update = function(xScore, yScore) { 
 		output = ""
 
-		if(window.feedback_type == 'FH' || window.is_practice) {
+		if(window.feedback_type == 'FH') {
 			output += "<b><font color="+xColor+">Blue:</font></b> "+xScore;
 			output += " ";
 			output += "<b><font color="+yColor+">Red:</font></b> "+yScore;
@@ -196,15 +196,50 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 			output += "</br>";
 		}
 		else if(window.feedback_type == 'LM') {
-			output += "<div style='text-align:left;width:450px;margin-left:auto;margin-right:auto'><h1><b><font color="+xColor+">Your score:</font></b> "+xScore;
-			output += "<br> ";
-			output += "<b><font color="+yColor+">Opponent score:</font></b> "+yScore;
-			output += "<br> ";
-			output += "<b><font color='black'>Difference:</font></b> "+ (xScore - yScore);
-			output += "<br> ";
-			output += "<b><font color='black'>Time elapsed:</font></b> "+ (window.game.ticks*window.game.msPerTick/1000)+" secs";
+			output += "<div style='text-align:left;width:500px;margin-left:auto;margin-right:auto'>";
 
-			output += "</div></center>"; 
+			msg = "<h2>The game is now running.</h2>";
+			if(!window.game.running) msg='';
+			output += '<span id="countdown">'+msg+'</span>';
+
+			if(window.game.running) {
+				//output += "<b><font color='black'>Time elapsed:</font></b> <span id='clock'>"+ (window.game.ticks*window.game.msPerTick/1000)+"</span> secs";
+
+				var board = $('#gameBoard_LM_canvas');
+
+				var context = board[0].getContext('2d');
+
+				context.clearRect( 0, 0, board.width(), board.height() );
+
+				center = board.width()/2;
+
+				x = center;
+				y = 0
+				width = 1
+				height = board.height()
+				drawRect(context, x, y, width, height, 'black')
+
+				//var not = '';
+				//if(!window.game.lastFlipGood) {
+				//	not = 'not';
+				//}
+				//output += "<br><b><font color='black'>Your last flip was </font></b>"+ not + " good";
+
+                
+            setTimeout(function() {
+					width = window.game.deltaOfDeltas;
+					height = 25;
+					x = center;
+					y = board.height()/2 - height/2
+					color = width > 0 ? 'green':'red';
+
+					drawRect(context, x, y, width, height, color)
+
+				}, 250);
+
+			}
+
+			output += "</div>"; 
 		}
 
 		scoreBoardElement.html(output);

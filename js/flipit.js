@@ -1,10 +1,4 @@
 /**
- * @author Ethan Heilman 
- *
- **/
-
-
-/**
  * Creates a new FlipItGame Object for playing 'flip it'.
  *
  * new FlipItGame( new FlipItRenderEngine, funct, funct, funct(num x, num y) )
@@ -26,6 +20,10 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 	 Players.periodicPlayerTick = Math.floor((Math.random()*400)+100);
 	 Players.anchor = Math.floor((Math.random()*400)+10);
   }
+  this.scoreBoardFunct = scoreBoardFunct;
+  this.lastDiff = 0;
+  this.thisDiff = 0;
+  this.deltaOfDeltas = 0;
 
   /**
    * Clears and refreshes all the varables to start a new game.
@@ -41,7 +39,12 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
     this.flips = [];
 
     this.xScore = 0;
-    this.yScore = 0;
+	 this.yScore = 0;
+	 this.lastFlipGood = false;
+
+	 this.lastDiff = 0;
+	 this.thisDiff = 0;
+	 this.deltaOfDeltas = 0;
 
     renderer.drawBoard( 0, [] );
   }
@@ -68,6 +71,7 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 
       var self = this; //Save the current context
       this.clock = setInterval( function(){ self.tick( numTicks ); }, msPerTick);
+		this.scoreBoardFunct(0, 0);
     }
   };
 
@@ -111,6 +115,18 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
     
     //only draw every fifth frame
     if ( this.ticks % 5 == 0 ) renderer.drawBoard( this.ticks, this.flips );
+
+	elapsed = (window.game.ticks*window.game.msPerTick);
+
+	if(elapsed % 100 == 0) {
+		str = elapsed/1000;
+		if(elapsed % 1000 == 0) {
+      	str = elapsed/1000+'.0';
+		}
+
+
+		$('#clock').html(str);
+	}
   };
 
   /**
@@ -119,9 +135,20 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
   this.defenderFlip = function() {
     if (this.running == true) {
       this.flips[this.ticks] = "X";
-      this.control = "X";
 
+		this.lastFlipGood = false;
+		if(this.control == 'Y') {
+			this.lastFlipGood = true;
+		}
+      
+		this.control = "X";
       this.xScore -= xFlipCost;
+
+		this.thisDiff = this.xScore - this.yScore;
+
+      this.deltaOfDeltas = this.thisDiff - this.lastDiff;
+
+		this.lastDiff = this.thisDiff;
     }
   };
 

@@ -134,7 +134,8 @@ function getMostRecentSessionId($db, $mturk_id) {
 
 function getRunId($db, $session_id) {
 	$q = "SELECT id FROM gameRun WHERE session_id='$session_id' ORDER BY started DESC LIMIT 1";
-	$data = runQuery($db, $q);
+	$data = @runQuery($db, $q);
+	if(!$data) return 0;
 	$id = $data[0]['id'];
 	return intval($id);
 }
@@ -176,6 +177,12 @@ function startGameSession($db, $mturk_id, $survey_blob, $info_treatment_id, $vis
 		logMessageAndDie($session_id);
 	}
 	return $session_id;
+}
+
+function isValidSession($db, $session_id) {
+	$q = "SELECT * FROM gameSession WHERE id=$session_id";
+	$data = runQuery($db, $q, false);
+	return count($data) == 1;
 }
 
 function startGameRun($db, $session_id, $tick, $anchor) {
