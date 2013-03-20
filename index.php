@@ -95,7 +95,7 @@
 		$repeat_mturk_ids = explode(',', $repeat_mturk_ids);
 		$repeat_mturk_ids = array_unique($repeat_mturk_ids);
                
-		if(in_array($mturk_id, $repeat_mturk_ids)) {
+		if($mturk_id!='' && in_array($mturk_id, $repeat_mturk_ids)) {
 			?>
 			<p>
 			Our records indicate that a user with the entered Mechanical Turk ID has already completed this experiment. Users cannot complete the experiment more than once. We are sorry for the inconvenience.
@@ -189,8 +189,8 @@
     <link rel="stylesheet" type="text/css" href="/flipIt/css/style.css" /> 
 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script type="text/javascript" src="/flipIt/js/flipit.js"></script>
-    <script type="text/javascript" src="/flipIt/js/drawflipit.js"></script>
+    <script type="text/javascript" src="js/flipit.js"></script>
+    <script type="text/javascript" src="js/drawflipit.js"></script>
     <script type="text/javascript" src="/flipIt/js/jquery.cookie.js"></script>
     <script type="text/javascript" src="/flipIt/js/purl.js"></script>
 
@@ -343,7 +343,7 @@
 							$('#gameBoard_FH').hide();
 						}           
 
-                  $('#countdown').html('The game is now running');
+                  $('#countdown').html('<h2>The game is now running</h2>');
 						game.start( msPerTickSlow, numTicksLong );
 					}
 				}

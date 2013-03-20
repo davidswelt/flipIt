@@ -213,18 +213,17 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 
 				center = board.width()/2;
 
-				x = center;
-				y = 0
-				width = 1
-				height = board.height()
-				drawRect(context, x, y, width, height, 'black')
-
-				var gave = 'gave';
 				if(!window.game.lastFlipGood) {
-					gave = 'did not give';
+					//output += "This flip did not give you back control";
+					if(window.game.lastX > 0)
+					setTimeout(function() {
+						drawX(context, center-50, board.height()/2-50, 9.5, 'blue', 5);
+					}, 250);
+					return;
 				}
-				output += "<br>This flip <b>"+gave+"</b> you back control";
 
+				//draw the middle vertical bar
+				//drawRect(context, center, 0, 1, board.height(), 'black')
 
 				function getParameterByName(name)
 				{
@@ -239,19 +238,41 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 				}
 
 				setTimeout(function() {
-					width = window.game.deltaOfDeltas;
+					center = board.width()/2;
 
-               if(getParameterByName('useAdj')=='yes') {
-						console.log('using adj');
+					var mapper = function( tick ){
+						return (tick/window.game.numTicks) * ( board.width() );
+					};     
+
+					blue_width = mapper(window.game.firstY - window.game.lastX);
+					red_width = mapper(window.game.currX - window.game.firstY);
+					console.log("blue: "+blue_width+", red: "+red_width);
+
+
+					if(getParameterByName('useAdj')=='yes') {
+						//console.log('using adj');
 						width = window.game.deltaOfDeltasAdj;
 					}
 
 					height = 25;
 					x = center;
 					y = board.height()/2 - height/2
-					color = width > 0 ? 'green':'red';
+					drawRect(context, x-2, y, -blue_width, height, xColor);
+					drawRect(context, x+2, y-height-2, red_width, height, yColor);
 
-					drawRect(context, x, y, width, height, color)
+
+
+					//for plotting the differences
+					//height = 25;
+					//x = center;
+					//y = board.height()/2 - height/2
+					//color = width > 0 ? 'green':'red';
+					//drawRect(context, x, y, width, height, color);
+
+					for(i=1;i<window.game.yNumFlipsInArea;i++) {
+						x = center + 10 + 20*i;
+						drawX(context, x, board.height()-20, 'red');
+					}
 
 				}, 250);
 
@@ -329,4 +350,30 @@ function drawHLine(context, x, y, l) {
     context.lineTo(x, y + l - line_fix);
   context.closePath();
   context.stroke();
+}
+
+
+function drawX(context, x, y, scale, color, linewidth){
+	if(!scale) scale = 1;
+	if(!color) color = 'blue';
+	if(!linewidth) linewidth = 1;
+
+	size = 10*scale;
+
+	context.fillStyle = color;
+	context.strokeStyle = color;
+	context.lineWidth=1+linewidth;
+	//draw a line
+	context.beginPath();
+		context.moveTo(x, y);
+		context.lineTo(x+size, y+size);
+	context.closePath();
+	context.stroke();
+
+	context.beginPath();
+		context.moveTo(x+size, y);
+		context.lineTo(x, y+size);
+	context.closePath();
+	context.stroke();
+	context.strokeStyle = 'black';
 }

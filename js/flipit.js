@@ -49,8 +49,14 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 		this.lastDiffAdj = 0;
 		this.thisDiffAdj = 0;
 		this.deltaOfDeltasAdj = 0;
- 
 
+		this.xAdj = 0;
+		this.yAdj = 0;
+
+		this.lastX = 0;
+		this.firstY = 0;
+		this.currX = 0;
+ 
 		renderer.drawBoard( 0, [] );
 	}
 
@@ -150,48 +156,55 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 
 
 			function previousXFlip() {
-				this.flips = window.game.flips;
-				
-				prev = null;
-				for(ftime in this.flips) {
-					if(this.flips[ftime] == 'X')
+				prev = 0;
+				for(ftime in window.game.flips) {
+					if(window.game.flips[ftime] == 'X')
 						if(ftime != window.game.ticks)
 							prev = ftime;
 				}
 				return prev;
 			}
+
 			function oppFlipsSinceLastX() {
-				this.flips = window.game.flips;
-				lastX = previousXFlip();
+				lastX = parseInt(previousXFlip());
+				window.game.firstY = 0;
 
 				num = 0;
-				for(ftime in this.flips) {
-					if(this.flips[ftime] == 'Y' &&
-						ftime > lastX) {
-						num++;
+				for(ftime in window.game.flips) {
+					if(parseInt(ftime) > lastX) {
+						if(window.game.flips[ftime] == 'Y') {
+							if(num == 0) window.game.firstY = ftime;
+							num++;
+						}
+						else {
+                  	window.game.currX = ftime;
+						}
 					}
+
 				}
 				return num;
 			}
 
+			this.lastX = previousXFlip();
+
 			
 			yNumFlipsInArea = oppFlipsSinceLastX();
 			this.yNumFlipsInArea = yNumFlipsInArea;
-			console.log(yNumFlipsInArea);
 
-			yAdj = this.yScore + (yFlipCost * yNumFlipsInArea);
-			xAdj = this.xScore;
+			this.yAdj = this.yScore + (yFlipCost * yNumFlipsInArea);
+			this.xAdj = this.xScore;
 
 			this.xScore -= xFlipCost;
 
 			this.thisDiff = this.xScore - this.yScore;
-			this.thisDiffAdj = xAdj - yAdj;
+			this.thisDiffAdj = this.xAdj - this.yAdj;
 
 			this.deltaOfDeltas = this.thisDiff - this.lastDiff;
 			this.deltaOfDeltasAdj = this.thisDiffAdj - this.lastDiffAdj;
 
 			this.lastDiff = this.thisDiff;
 			this.lastDiffAdj = this.thisDiffAdj;
+
 		}
 	};
 
