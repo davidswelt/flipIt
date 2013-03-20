@@ -215,7 +215,6 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 
 				if(!window.game.lastFlipGood) {
 					//output += "This flip did not give you back control";
-					if(window.game.lastX > 0)
 					setTimeout(function() {
 						drawX(context, center-50, board.height()/2-50, 9.5, 'blue', 5);
 					}, 250);
@@ -258,7 +257,7 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 					x = center;
 					y = board.height()/2 - height/2
 					drawRect(context, x-2, y, -blue_width, height, xColor);
-					drawRect(context, x+2, y-height-2, red_width, height, yColor);
+					drawRect(context, x+2, y, red_width, height, yColor);
 
 
 
