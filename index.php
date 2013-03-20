@@ -466,6 +466,7 @@
 
   <title>FlipIt - The Game of Stealthy Takeover</title>
   <body>
+	 <div id='above_buttons' style='min-height:300px;height:auto !important; height:300px;'>
 	 <div id='not_rules_panel'>
     <div id="top_panel">
       <h1 id="title">FlipIt - The Game of Stealthy Takeover</h1>
@@ -481,7 +482,8 @@
 		 <canvas id="gameBoard" width="800" height="150"></canvas>
 	 </div>
 	 </div>
-	 <br>
+	 </div><br>
+
 
     <button id="startBtn">Start</button> to play as the blue player<span id='statsBox'></span>
     <br><button id="flipBtn" style='width:75px;height:50px'>Flip</button> to flip.
