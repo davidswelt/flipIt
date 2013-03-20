@@ -261,6 +261,8 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 					drawRect(context, x-2, y, -blue_width, height, xColor);
 					drawRect(context, x+2, y, red_width, height, yColor);
 
+					drawArrow(context, center-(blue_width+10), y+height+10, center+red_width+10, y+height+10);
+
 
 
 					//for plotting the differences
