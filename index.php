@@ -466,7 +466,7 @@
 
   <title>FlipIt - The Game of Stealthy Takeover</title>
   <body>
-	 <div id='above_buttons' style='postion:absolute;height:500px'>
+	 <div id='above_buttons' style='min-height:300px;height:auto !important; height:300px;'>
 	 <div id='not_rules_panel'>
     <div id="top_panel">
       <h1 id="title">FlipIt - The Game of Stealthy Takeover</h1>

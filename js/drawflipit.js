@@ -215,6 +215,7 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 
 				if(!window.game.lastFlipGood) {
 					//output += "This flip did not give you back control";
+					if(window.game.currX > 0)
 					setTimeout(function() {
 						drawX(context, center-50, board.height()/2-50, 9.5, 'blue', 5);
 					}, 250);
@@ -245,7 +246,8 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 
 					blue_width = mapper(window.game.firstY - window.game.lastX);
 					red_width = mapper(window.game.currX - window.game.firstY);
-					console.log("blue: "+blue_width+", red: "+red_width);
+
+					if(blue_width < 0) return;
 
 
 					if(getParameterByName('useAdj')=='yes') {
