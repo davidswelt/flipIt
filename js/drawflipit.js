@@ -219,15 +219,33 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 				height = board.height()
 				drawRect(context, x, y, width, height, 'black')
 
-				//var not = '';
-				//if(!window.game.lastFlipGood) {
-				//	not = 'not';
-				//}
-				//output += "<br><b><font color='black'>Your last flip was </font></b>"+ not + " good";
+				var gave = 'gave';
+				if(!window.game.lastFlipGood) {
+					gave = 'did not give';
+				}
+				output += "<br>This flip <b>"+gave+"</b> you back control";
 
-                
-            setTimeout(function() {
+
+				function getParameterByName(name)
+				{
+					name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+					var regexS = "[\\?&]" + name + "=([^&#]*)";
+					var regex = new RegExp(regexS);
+					var results = regex.exec(window.location.search);
+					if(results == null)
+						return "";
+					else
+						return decodeURIComponent(results[1].replace(/\+/g, " "));
+				}
+
+				setTimeout(function() {
 					width = window.game.deltaOfDeltas;
+
+               if(getParameterByName('useAdj')=='yes') {
+						console.log('using adj');
+						width = window.game.deltaOfDeltasAdj;
+					}
+
 					height = 25;
 					x = center;
 					y = board.height()/2 - height/2

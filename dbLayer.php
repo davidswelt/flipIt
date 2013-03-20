@@ -181,8 +181,8 @@ function startGameSession($db, $mturk_id, $survey_blob, $info_treatment_id, $vis
 
 function isValidSession($db, $session_id) {
 	$q = "SELECT * FROM gameSession WHERE id=$session_id";
-	$data = runQuery($db, $q, false);
-	return count($data) == 1;
+	$data = runQuery($db, $q);
+	return count($data) > 0;
 }
 
 function startGameRun($db, $session_id, $tick, $anchor) {

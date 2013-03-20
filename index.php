@@ -67,8 +67,6 @@
 		
 		$survey_blob = json_encode($_REQUEST);
 
-		//get info_treatment stuff here
-		//save it and use it later
 		$db = db_connect();
 		createNewSession($db, $survey_blob);
 	}
@@ -388,14 +386,14 @@
 			desc = desc.replace(/%{anchor}/g,anchor);
 
 			$('#opponent_description').html(desc); 
-		}   
+		} 
 
 		function pluralize_stupid(num, word) {
-      	return (num != 1) ? word+'s': word;
+			return (num != 1) ? word+'s': word;
 		}
 
 		function value_and_plural(num, word) {
-      	return num+" "+pluralize_stupid(num, word);
+			return num+" "+pluralize_stupid(num, word);
 		}
 
 		//handles changing from practice to normal
@@ -409,10 +407,10 @@
 
 			if(num_runs_remaining > 0) {
 				$('#startBtn').html('Start next game');
-            var infoString = '';
+				var infoString = '';
 
 				if(num_practice_runs_remaining > 0) {
-            	infoString = value_and_plural(num_practice_runs_remaining, 'practice round')+' left';
+					infoString = value_and_plural(num_practice_runs_remaining, 'practice round')+' left';
 					window.is_practice = true;
 
 					$('h1#title').html('Round for Practice');
@@ -427,7 +425,7 @@
 					if(num_practice_runs_remaining == 0) {
 						var extra = '';
 						if(window.feedback_type == 'LM') {
-                  	extra = ' From now on, you will not see the game board. However, when you play \'flip\' you will be told if your flip is effective or not, when your opponent last moved, and what the current time is.';
+							//extra = ' From now on, you will not see the game board. However, when you play \'flip\' you will be told if your flip is effective or not, when your opponent last moved, and what the current time is.';
 						}
 						if(showAlert) {
 							alert('Each round you play from now on will be counted. Results of these rounds will affect your bonus payment. You must play '+value_and_plural(num_runs_remaining, 'more round')+' in order to be paid.'+extra);
