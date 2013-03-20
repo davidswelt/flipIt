@@ -271,7 +271,7 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 
 					for(i=1;i<window.game.yNumFlipsInArea;i++) {
 						x = center + 10 + 20*i;
-						drawX(context, x, board.height()-20, 'red');
+						drawX(context, x, board.height()-20);
 					}
 
 				}, 250);
@@ -355,7 +355,7 @@ function drawHLine(context, x, y, l) {
 
 function drawX(context, x, y, scale, color, linewidth){
 	if(!scale) scale = 1;
-	if(!color) color = 'blue';
+	if(!color) color = 'red';
 	if(!linewidth) linewidth = 1;
 
 	size = 10*scale;
