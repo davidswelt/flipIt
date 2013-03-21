@@ -5,6 +5,8 @@
   
 <?php 
 
+	define('INSTRUCTIONS', 'instructions_LM.php'); //this should be updated programatically but is not since sessions are assigned after the point of instructions. This is a problem for future Alan.
+
 	include_once(dirname(__FILE__).'/die_if_ie_under_9.php'); 
 	include_once(dirname(__FILE__).'/config/config.php');
 
@@ -45,7 +47,8 @@
 	}
 
 	function displayInstructions() {
-   	include('instructions.php');
+		include(INSTRUCTIONS);
+		include('confirm_instructions.php');
 		die;
 	}
 	function displaySurvey() {
@@ -506,7 +509,7 @@
 	 <button onclick='$("#rules_panel").fadeToggle("fast","linear")'>Show/hide rules</button>
 	 </div>
 
-	 <?php include('instructions.php') ?>
+	 <?php include(INSTRUCTIONS); ?>
 	 <script>
 	 $('#rules_panel').hide();
 	 $('#instructions_confirm_form').hide();

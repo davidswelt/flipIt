@@ -110,12 +110,3 @@ The exchange rate for points into the bonus payment is 1 cent for 100 points. Fo
  </ul>
 </div> 
 
-<form action='index.php' method='GET' id='instructions_confirm_form'>
-	<input type='submit' value='I understand the above rules' />
-	<input type='hidden' name='prevPage' value='instructions' />
-	<?php
-	if(array_key_exists('lab', $_GET)) {
-		echo "<input type='hidden' id='lab' name='lab' value='lab'>\n";
-	}
-	?> 
-</form> 
