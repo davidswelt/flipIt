@@ -48,6 +48,9 @@ function FlipItRenderEngine( renderSettings ) {
   var circleSize = board.width()/200;
   var rightMargin = renderSettings.rightMargin;
 
+  this.xColor = xColor;
+  this.yColor = yColor;
+
 
   /**
    * Sets up a new board. 
@@ -154,23 +157,27 @@ function FlipItRenderEngine( renderSettings ) {
 
 	//this function fills in circules for the flips made at the 
 	//end of the game that you did not see
-  this.drawEnd = function(ticks, flips) {
-    var context = board[0].getContext("2d");
-    var w = board.width();
-    var h = board.height();
+	this.drawEnd = function(ticks, flips) {
+		var context = board[0].getContext("2d");
+		var w = board.width();
+		var h = board.height();
 
-    // maps ticks in the game state to x-coordines on the board
-    var mapX = function( tick ){
-        return (tick/numTicks) * ( w - rightMargin );
-    };   
-    for ( var tick = 0; tick < ticks; tick++ ) {
-      if ( tick in flips ) {
-        var x = mapX(tick);
-          if ( flips[tick] == "Y" ) drawCircle( context, yColor, circleSize, x, h/4); 
-          if ( flips[tick] == "X" ) drawCircle( context, xColor, circleSize,  x, 3*h/4); 
-     }         
-  }
-};
+		// maps ticks in the game state to x-coordines on the board
+		var mapX = function( tick ){
+			return (tick/numTicks) * ( w - rightMargin );
+		};
+		for ( var tick = 0; tick < ticks; tick++ ) {
+			if ( tick in flips ) {
+				var x = mapX(tick);
+				if ( flips[tick] == "Y" ) drawCircle( context, yColor, circleSize, x, h/4); 
+				if ( flips[tick] == "X" ) drawCircle( context, xColor, circleSize,  x, 3*h/4); 
+			}
+		}
+
+
+
+
+	};
 }
 
 /**
@@ -185,7 +192,7 @@ function FlipItRenderEngine( renderSettings ) {
  */
 function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 	this.update = function(xScore, yScore) { 
-		output = ""
+		output = "";
 
 		if(window.feedback_type == 'FH') {
 			output += "<b><font color="+xColor+">Blue:</font></b> "+xScore;
@@ -198,94 +205,130 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 		else if(window.feedback_type == 'LM') {
 			output += "<div style='text-align:left;width:500px;margin-left:auto;margin-right:auto'>";
 
-			msg = "<h2>The game is now running.</h2>";
+			msg = "<h2 style='display:inline'>The game is now running.</h2>";
 			if(!window.game.running) msg='';
-			output += '<span id="countdown">'+msg+'</span>';
+			output += '<div id="countdown" style="min-height:100px;height:auto !important; height:100px;" >'+msg+'</div>';
 
-			if(window.game.running) {
-				//output += "<b><font color='black'>Time elapsed:</font></b> <span id='clock'>"+ (window.game.ticks*window.game.msPerTick/1000)+"</span> secs";
+			//if(window.game.running) {
+				//output += getTimeElapsed();
 
-				var board = $('#gameBoard_LM_canvas');
-
-				var context = board[0].getContext('2d');
-
-				context.clearRect( 0, 0, board.width(), board.height() );
-
-				center = board.width()/2;
-
-				if(!window.game.lastFlipGood) {
-					//output += "This flip did not give you back control";
-					if(window.game.currX > 0)
-					setTimeout(function() {
-						drawX(context, center-50, board.height()/2-50, 9.5, 'blue', 5);
-					}, 250);
-					return;
-				}
-
-				//draw the middle vertical bar
-				//drawRect(context, center, 0, 1, board.height(), 'black')
-
-				function getParameterByName(name)
-				{
-					name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-					var regexS = "[\\?&]" + name + "=([^&#]*)";
-					var regex = new RegExp(regexS);
-					var results = regex.exec(window.location.search);
-					if(results == null)
-						return "";
-					else
-						return decodeURIComponent(results[1].replace(/\+/g, " "));
-				}
-
-				setTimeout(function() {
-					center = board.width()/2;
-
-					var mapper = function( tick ){
-						return (tick/window.game.numTicks) * ( board.width() );
-					};     
-
-					blue_width = mapper(window.game.firstY - window.game.lastX);
-					red_width = mapper(window.game.currX - window.game.firstY);
-
-					if(blue_width < 0) return;
-
-
-					if(getParameterByName('useAdj')=='yes') {
-						//console.log('using adj');
-						width = window.game.deltaOfDeltasAdj;
-					}
-
-					height = 25;
-					x = center;
-					y = board.height()/2 - height/2
-					drawRect(context, x-2, y, -blue_width, height, xColor);
-					drawRect(context, x+2, y, red_width, height, yColor);
-
-					drawArrow(context, center-(blue_width+10), y+height+10, center+red_width+10, y+height+10);
-
-
-
-					//for plotting the differences
-					//height = 25;
-					//x = center;
-					//y = board.height()/2 - height/2
-					//color = width > 0 ? 'green':'red';
-					//drawRect(context, x, y, width, height, color);
-
-					for(i=1;i<window.game.yNumFlipsInArea;i++) {
-						x = center + 10 + 20*i;
-						drawX(context, x, board.height()-20);
-					}
-
-				}, 250);
-
-			}
+				drawLMGame(xColor, yColor);
+			//}
 
 			output += "</div>"; 
 		}
 
 		scoreBoardElement.html(output);
 	};
+}
+
+function getTimeElapsed() {
+	output = '';
+
+	output += "<b><font color='black'>Time elapsed:</font></b>";
+	output += "<span id='clock'>";
+	output += (window.game.ticks*window.game.msPerTick/1000);
+	output += "</span> secs";
+	return output;
+}
+
+//gets a GET parameter from the URL, must be of x=y format
+function getParameterByName(name)
+{
+	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+	var regexS = "[\\?&]" + name + "=([^&#]*)";
+	var regex = new RegExp(regexS);
+	var results = regex.exec(window.location.search);
+	if(results == null)
+		return "";
+	else
+		return decodeURIComponent(results[1].replace(/\+/g, " "));
+}                     
+
+function clearLMBoard() {
+	var board = $('#gameBoard_LM_canvas');
+
+	var context = board[0].getContext('2d');
+	context.clearRect( 0, 0, board.width(), board.height() );
+}
+
+function drawLMGame(xColor, yColor, end) {
+	var board = $('#gameBoard_LM_canvas');
+
+	var context = board[0].getContext('2d');
+
+	context.clearRect( 0, 0, board.width(), board.height() );
+
+	center = board.width()/2;
+
+	if(end && window.game) {
+   	window.game.currX = window.game.numTicks;
+	}
+
+
+	//flip did not give back control to player
+	if(!window.game.lastFlipGood) {
+		if(window.game.currX > 0) {
+			if(window.game.running) {
+				setTimeout(function() {
+					drawX(context, center-50, board.height()/2-50, 9.5, 'blue', 5);
+					}, 250);
+			}
+			return;
+		}
+	}
+	if(window.game.currX == 0) return;
+
+	//draw the middle vertical bar
+	//drawRect(context, center, 0, 1, board.height(), 'black')
+
+
+	setTimeout(function() {
+		center = board.width()/2;
+
+		var mapLM = function( tick ){
+			return (tick/window.game.numTicks) * ( board.width() );
+		};     
+
+		blue_width = mapLM(window.game.firstY - window.game.lastX);
+		red_width = mapLM(window.game.currX - window.game.firstY);
+
+
+
+		//draw blue and red bars
+		height = 25;
+		adj_center = (board.width() - (red_width+blue_width))/2;
+		x= adj_center;
+		y = board.height()/2 - height/2;
+
+		drawRect(context, x, y, blue_width, height, xColor);
+		drawRect(context, x+blue_width+4, y, red_width, height, yColor);
+
+
+		//draw the arrow below the bars
+		drawArrow(context, x-5, y+height+10, x+blue_width+red_width+10, y+height+10);
+
+
+		//draw the little red X's for missed opp flips
+		for(i=1;i<window.game.yNumFlipsInArea;i++) {
+			x = adj_center+blue_width+4 + 10 + 20*i;
+			drawX(context, x, board.height()-20);
+		}    
+
+
+		//if(getParameterByName('useAdj')=='yes') {
+		//	console.log('using adj');
+		//	width = window.game.deltaOfDeltasAdj;
+		//}                                            
+		//for plotting the differences
+		//height = 25;
+		//x = center;
+		//y = board.height()/2 - height/2
+		//color = width > 0 ? 'green':'red';
+		//drawRect(context, x, y, width, height, color);
+
+
+	}, 250);      
 }
 
 /**

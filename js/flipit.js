@@ -56,7 +56,7 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 		this.lastX = 0;
 		this.firstY = 0;
 		this.currX = 0;
- 
+
 		renderer.drawBoard( 0, [] );
 	}
 
@@ -90,15 +90,20 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 	 * Ends the current game.
 	 **/
 	this.endGame = function() {
+		if ( scoreBoardFunct != null ) scoreBoardFunct( this.xScore, this.yScore );
+
+		if(!this.flips[this.numTicks])
+			this.defenderFlip();
+		drawLMGame(renderer.xColor, renderer.yColor, true);
+
 		clearInterval( this.clock );
 		this.running = false;
 		this.resetAnchorAndPPT();
 
 		renderer.drawEnd(this.numTicks, this.flips);
-		//renderer.drawBoard(this.numTicks, this.flips);
 
+		drawLMGame(renderer.xColor, renderer.yColor, true);
 
-		if ( scoreBoardFunct != null ) scoreBoardFunct( this.xScore, this.yScore );
 	};
 
 	/**
@@ -129,13 +134,12 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 
 		elapsed = (window.game.ticks*window.game.msPerTick);
 
+		//for the clock, which is currently invisible
 		if(elapsed % 100 == 0) {
 			str = elapsed/1000;
 			if(elapsed % 1000 == 0) {
 				str = elapsed/1000+'.0';
 			}
-
-
 			$('#clock').html(str);
 		}
 	};
@@ -144,7 +148,7 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 	* When the defender, player x, flips call this function. 
 	**/
 	this.defenderFlip = function() {
-		if (this.running == true) {
+		//if (this.running == true) {
 			this.flips[this.ticks] = "X";
 
 			this.lastFlipGood = false;
@@ -187,13 +191,13 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 
 			this.lastX = previousXFlip();
 
-			
 			yNumFlipsInArea = oppFlipsSinceLastX();
 			this.yNumFlipsInArea = yNumFlipsInArea;
 
 			this.yAdj = this.yScore + (yFlipCost * yNumFlipsInArea);
 			this.xAdj = this.xScore;
 
+			if(this.running)
 			this.xScore -= xFlipCost;
 
 			this.thisDiff = this.xScore - this.yScore;
@@ -205,7 +209,7 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 			this.lastDiff = this.thisDiff;
 			this.lastDiffAdj = this.thisDiffAdj;
 
-		}
+		//}
 	};
 
 	/**
@@ -217,6 +221,7 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 			this.control = "Y";
 
 			this.yScore -= yFlipCost;
+
 		}
 	}
 };

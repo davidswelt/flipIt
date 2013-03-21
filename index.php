@@ -253,7 +253,7 @@
 			window.game = game;
 
 			if(window.feedback_type != 'FH') {
-				$('#gameBoard_FH').hide();
+				//$('#gameBoard_FH').hide();
 			}          
 			game.newGame();
 			sb.update(0, 0);
@@ -343,7 +343,7 @@
 						$('#flash').css('visibility', 'hidden');
 
 						if(window.feedback_type != 'FH') {
-							$('#gameBoard_FH').hide();
+							//$('#gameBoard_FH').hide();
 						}           
 
                   $('#countdown').html('<h2>The game is now running</h2>');
@@ -430,6 +430,8 @@
 						if(window.feedback_type == 'LM') {
 							//extra = ' From now on, you will not see the game board. However, when you play \'flip\' you will be told if your flip is effective or not, when your opponent last moved, and what the current time is.';
 						}
+
+
 						if(showAlert) {
 							alert('Each round you play from now on will be counted. Results of these rounds will affect your bonus payment. You must play '+value_and_plural(num_runs_remaining, 'more round')+' in order to be paid.'+extra);
 						}
