@@ -250,7 +250,7 @@ function recordbonus($db, $mturk_id, $hit_id, $bonus, $session_id, $info_treatme
 	$q = "DELETE FROM bonus WHERE session_id=$session_id";
    $data = runQuery($db, $q, false);
 
-	$q = "INSERT INTO bonus (mturk_id, hit_id, amount, session_id, info_treatment_id, visual_treatment_id, finished) VALUES ('$mturk_id', '$hit_id', '$bonus', $session_id, $info_treatment_id, $visual_treatment_id, now())";
+	$q = "INSERT INTO bonus (mturk_id, hit_id, amount, session_id, info_treatment_id, visual_treatment_id, finished, paid) VALUES ('$mturk_id', '$hit_id', '$bonus', $session_id, $info_treatment_id, $visual_treatment_id, now(), 0)";
 
 	runQuery($db, $q, false);
 }
