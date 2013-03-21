@@ -290,8 +290,12 @@ function drawLMGame(xColor, yColor, end) {
 			return (tick/window.game.numTicks) * ( board.width() );
 		};     
 
+		if(window.game.firstY-window.game.lastX == 0) return;
+
 		blue_width = mapLM(window.game.firstY - window.game.lastX);
 		red_width = mapLM(window.game.currX - window.game.firstY);
+
+		if(blue_width <0 || red_width<0) return;
 
 
 

@@ -189,24 +189,24 @@
 		}
 	}
 ?>
-    <link rel="stylesheet" type="text/css" href="/flipIt/css/style.css" /> 
+	<link rel="stylesheet" type="text/css" href="/flipIt/css/style.css" /> 
 
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script type="text/javascript" src="js/flipit.js"></script>
-    <script type="text/javascript" src="js/drawflipit.js"></script>
-    <script type="text/javascript" src="/flipIt/js/jquery.cookie.js"></script>
-    <script type="text/javascript" src="/flipIt/js/purl.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript" src="js/flipit.js"></script>
+	<script type="text/javascript" src="js/drawflipit.js"></script>
+	<script type="text/javascript" src="/flipIt/js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="/flipIt/js/purl.js"></script>
 
-    <!-- Start flipit.js once the document loads -->
-    <script type="text/javascript">
+	<!-- Start flipit.js once the document loads -->
+	<script type="text/javascript">
 	 	function testCookie() {
 			testCookie.enabled = false;
 			$.cookie('testCookie','1');
 			var test = $.cookie('testCookie');
 			if(test) {
-         	testCookie.enabled = true;
+				testCookie.enabled = true;
 			}
-		}      
+		}
 
 		function getSession() {
 			var session_id = $.cookie('<?php global $sid_string;echo $sid_string ?>');
@@ -217,8 +217,8 @@
 	 	function getCleanFlipString(dirty) {
 			clean = [];
 
-         for(var i=0;i<dirty.length;i++) {
-         	if(dirty[i] != null) {
+			for(var i=0;i<dirty.length;i++) {
+				if(dirty[i] != null) {
 					clean.push(i+":"+dirty[i]);
 				}
 			}
@@ -253,7 +253,7 @@
 			window.game = game;
 
 			if(window.feedback_type != 'FH') {
-				//$('#gameBoard_FH').hide();
+				$('#gameBoard_FH').hide();
 			}          
 			game.newGame();
 			sb.update(0, 0);
@@ -265,15 +265,21 @@
 			var firstTime = true;
 			window.game = game;
 
-		  setInterval(function() {
-
-
-			  if(game.running) {
-               $('#startBtn').attr('disabled','disabled')
+			setInterval(function() {
+				if(game.running) {
+					$('#startBtn').removeAttr('disabled')
+					$('#startBtnAndText').hide();
+					$('#flipBtnAndText').show();
 					endMsgDisplayed = 'No';
-			  }
-			  else {
-				  if(endMsgDisplayed != 'Yes') {
+				}
+				else {
+					if($('#countdown').html() == '<h2 style="display:inline">The game is now running.</h2>')
+						$('#countdown').html('');
+
+					$('#startBtnAndText').show();
+					$('#flipBtnAndText').hide();
+
+					if(endMsgDisplayed != 'Yes') {
 					 if(game.xScore - game.yScore > 0) {
 						 endMsg = "Good job! You won!";
 					 }
@@ -313,13 +319,13 @@
 					 redScores = [];
 				  }
 
-				  $('#startBtn').removeAttr('disabled')
 			  }
 		  }, msPerTickSlow);
 
-        //setup buttons
-        $("#startBtn").click( function() {
+		//setup buttons
+		$("#startBtn").click( function() {
 				if(!game.running) {
+					clearLMBoard();
 					setTimeout(function() { 
 						$('#countdown').append('<h4 style="display:inline">Game will start in 3</h4>...'); 
 						setTimeout(function() { 
@@ -343,10 +349,9 @@
 						$('#flash').css('visibility', 'hidden');
 
 						if(window.feedback_type != 'FH') {
-							//$('#gameBoard_FH').hide();
+							$('#gameBoard_FH').hide();
 						}           
 
-                  $('#countdown').html('<h2>The game is now running</h2>');
 						game.start( msPerTickSlow, numTicksLong );
 					}
 				}
@@ -409,7 +414,7 @@
 			var num_practice_runs_remaining = session_stats['num_practice_runs_remaining'];
 
 			if(num_runs_remaining > 0) {
-				$('#startBtn').html('Start next game');
+				$('#startBtn').html('Start game');
 				var infoString = '';
 
 				if(num_practice_runs_remaining > 0) {
@@ -490,8 +495,8 @@
 	 </div><br>
 
 
-    <button id="startBtn">Start</button> to play as the blue player<span id='statsBox'></span>
-    <br><button id="flipBtn" style='width:75px;height:50px'>Flip</button> to flip.
+    <span id='startBtnAndText'><button id="startBtn" style='width:75px;height:50px;' >Start</button> to play as the blue player<span id='statsBox'></span></span>
+    <span id='flipBtnAndText' style='display:none'><button id="flipBtn" style='width:75px;height:50px;'>Flip</button> to flip.</span>
 
     <br><br>
 

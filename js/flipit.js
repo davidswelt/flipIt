@@ -90,11 +90,9 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 	 * Ends the current game.
 	 **/
 	this.endGame = function() {
-		if ( scoreBoardFunct != null ) scoreBoardFunct( this.xScore, this.yScore );
 
 		if(!this.flips[this.numTicks])
 			this.defenderFlip();
-		drawLMGame(renderer.xColor, renderer.yColor, true);
 
 		clearInterval( this.clock );
 		this.running = false;
@@ -103,6 +101,7 @@ function FlipItGame( renderer, playerX, playerY, scoreBoardFunct) {
 		renderer.drawEnd(this.numTicks, this.flips);
 
 		drawLMGame(renderer.xColor, renderer.yColor, true);
+		if ( scoreBoardFunct != null ) scoreBoardFunct( this.xScore, this.yScore );
 
 	};
 
