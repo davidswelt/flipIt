@@ -1,50 +1,50 @@
 <div id="rules_panel">
- <h2>Basic Rules</h2>
+<h2>Basic Rules</h2>
 <ul style='list-style-type: none'><li>
-<p>You will be playing multiple rounds of a two-player game called
- FlipIt. The objective of FlipIt is to gain and maintain possession of
- the game board. The board has two colors - red one one side, and blue
- on the other, and it can be flipped by either you or the other
- player.  When it shows your color ("blue"), you have possession of
- the board.</p> 
-
-<p>However, until you flip the board, the state of possession of the game board is hidden from your view. In this state, you will not see the board on the screen.</p> 
-
-<p>The only action you have available is to 'flip' the game board. When you "flip" the board, you will see the board, but the game will also reveal some important information.</p>
-
-<p>If you flip and regain possession of the board from the opponent, you
-  will see a graphic on the screen that shows how long you had the
-  board beforehand (a blue bar), and how long the opponent had it
-  until you flipped (a red bar).  You will also see whether the
-  opponent flipped multiple times (more than necessary): one or more
-  small red "X" symbols will indicate this.  If you flip at a time when you already own the board, then you will see a large "X" on the screen.  You will maintain possession of the board, and it won't actually change colors.</p>
-<p>All of this information will only be shown to you and not your opponent.</p>
+<p>You will be playing multiple rounds of a two-player game called FlipIt. The objective of FlipIt is to gain and maintain possession of a game board. Until you take an action, the state of the game board is hidden from your view, and no information is provided to you.</p>
  
-  <p>Let's take a look at a few examples
-	  from a game.</p>
-	  <center><img src='images/midgame3.png' />   </center>
-<p>You can see that you had the board for a while (blue bar) until the opponent
-	  flipped, and that you then waited a long time before
-	  flipping back.  The opponent flipped two more times without
-	  need, as indicated by the two red 'X'.  So, you should have
-	  flipped much earlier.</p>
+<p>The only action you have available is to "flip" the board. When you flip the board, you gain possession of the board, or maintain possession if you already owned the board. The same rules apply to your opponent.</p>
+
+<p>When you flip the board, you will be provided with information in graphical form about the game play, which we detail below.</p>
+</li>
+</ul>
+
+<h2>Available Information during the Game</h2>
+<ul style='list-style-type: none'><li>
+
+<p>If your opponent flipped the board since you last took action, then you will regain control over the board with your flip. You will see a graphic on the screen that shows how long you had possession of the board since your last flip. This is indicated by a blue bar of variable length. You will also see how long the opponent had possession of the board. This is shown with a red bar of variable length.<p>
+
+<p>You will also be provided with an additional piece of information. It may happen that the opponent tried to flip the board multiple times up until your most recent flip. The small red "x" symbols indicate the number of flips that your opponent did after he already had possession of the board.</p>
+
+<p>If you flip at a time when you already own the board, then you will see a large blue "X" on the screen. You will continue to maintain possession of the board.</p>
+</li>
+</ul>
+
+<h2>Examples of the Graphical Information</h2>
+<ul style='list-style-type: none'><li>
+ 
+<p>Please take a look at the following examples from a specific game.</p>
+
+<center><img src='images/midgame3.png' />   </center>
+
+<p>You can see that you had possession of the board after your last flip as indicated by the blue bar. You lost possession when the opponent flipped the board, and the opponent began to accumulate possession time. The opponent flipped two more times but the flips only maintained the opponent's possession of the board. Those two flips are indicated by the two red "x" below the red bar. The location of the two red "x" below the red bar does not signal when exactly these additional flips happened.
+</p>
+
 <p>Consider the next chart:</p>
 <center><img src='images/midgame4.png' /></center>
 
-<p>Here, you flipped earlier, though not early enough.  The opponent
-flipped soon after your flip, and then one more time.</p>
-<p>The next situation shows what happens when you flip while already
-	  owning the board.  This extra flip will cost you 100
-	  points:</p>
+<p>This sequence differs from the example above in several ways. You owned the board for a longer period of time before the opponent played flip. The opponent owned the board for a shorter amount of time, and played only one additional flip that did not change the status of the board.
+</p>
+
+<p>The next situation shows what happens when you flip while already owning the board. You are shown a large blue "X". Please note that each flip is costly. 
+</p>
 
 	<center>  <img src='images/blue_x.png' width='200' /> </center>
 
-<p>Again, you cannot observe if and when the opponent flipped the board
+<p>Please remember that you cannot observe if and when the opponent flipped the board
 in the past, until you take the action to flip the board yourself.</p>
 
-<p>The same rules apply to your opponent.</p>
-
-<p>Below, we break down the rules in more detail.</p>
+<p>Below, we provide additional important details of the game and show an example for a complete FlipIt game.</p>
 </li></ul>
 
  <h2>Detailed Rules</h2>
@@ -75,20 +75,14 @@ in the past, until you take the action to flip the board yourself.</p>
 	</li>
  
 	<li>
-	  <h3>The Board</h3>
+	  <h3>An Example of a Complete Game</h3>
 	  <p>
-	  The board displays the latest available information about the game, including the opponent and your own last possession times leading up to your last flip, or a blue "X" if you flipped while in possession of the board.
-	 
-	  You can only see information that was revealed by your flips.
-<br>
-	The following graphic demonstrates how the game works.  <p>You
-	will never see all of this information at once, but it is
-	helpful to illustrate how the game works.</p>
+In the following, we show a graphical representation of an example FlipIt game. When you play the game you will not see all this information at once, but it may be helpful to illustrate how the game works.</p>
 	
 		  <img src='images/example_game.png' width='800' />
 
 	 <p>   
-	  Let's examine the moves made in an example game:
+	  Let's examine the moves made in this example game:
 	  </p>
 	  <ul>
 		 <li>
