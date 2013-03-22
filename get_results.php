@@ -24,7 +24,7 @@ function db_connect() {
 }
 
 function get_entry_data($db) {
-	$q = "SELECT bonus.amount as total_bonus, bonus.session_id, gameRun.id as run_id, bonus.info_treatment_id, gameRun.tick, gameRun.anchor, flips, blue_score, red_score, survey_blob FROM bonus, gameRun, gameSession, gameResult WHERE gameRun.session_id = bonus.session_id AND gameSession.id = bonus.session_id AND gameResult.run_id = gameRun.id";
+	$q = "SELECT bonus.amount as total_bonus, bonus.session_id, gameRun.id as run_id, bonus.info_treatment_id, gameRun.tick, gameRun.anchor, flips, blue_score, red_score, survey_blob, bonus.visual_treatment_id, paid FROM bonus, gameRun, gameSession, gameResult WHERE gameRun.session_id = bonus.session_id AND gameSession.id = bonus.session_id AND gameResult.run_id = gameRun.id";
 
 	try {
 		$results = $db->query($q);
