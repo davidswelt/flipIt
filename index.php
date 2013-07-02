@@ -21,20 +21,30 @@
 		setcookie('hit_id', $hit_id);
 	}                              
 
+	$prevPage = '';
+	if(array_key_exists('prevPage', $_REQUEST)) {
+		$prevPage = $_REQUEST['prevPage'];
+	}
+
+	$page = '';
+	if(array_key_exists('page', $_REQUEST)) {
+		$prevPage = $_REQUEST['prevPage'];
+	}   
+
 	if(array_key_exists($sid_string, $_COOKIE) ||
-		$_REQUEST['prevPage'] == 'survey') {
+	   $prevPage == 'survey' || defined('DEMO')) {
 		processSurveyAndCreateSession();
 	}
 	else {
-		if(!array_key_exists('prevPage', $_REQUEST)) {
+		if(!$prevPage) {
 			echo '</head>';
 			displayConsent();
 		}
-		elseif($_REQUEST['prevPage'] == 'consentForm') {
+		elseif($prevPage == 'consentForm') {
 			echo '</head><body>';
 			displayInstructions();
 		}
-		elseif($_REQUEST['prevPage'] == 'instructions') {
+		elseif($prevPage == 'instructions') {
 			displaySurvey();
 		}
 	}
@@ -256,10 +266,10 @@
 			var game = new FlipItGame( gDraw, Players["humanPlayer"], Players["periodicPlayer"], sb.update );
 			window.game = game;
 
-			if(window.feedback_type != 'LM') {
+			if(window.feedback_type != 'all' && window.feedback_type != 'LM') {
 				$('#gameBoard_LM').hide();
 			}
-			if(window.feedback_type != 'FH') {
+			if(window.feedback_type != 'all' && window.feedback_type != 'FH') {
 				$('#gameBoard_FH').hide();
 			}          
 			game.newGame();
@@ -355,10 +365,10 @@
 
 						$('#flash').css('visibility', 'hidden');
 
-						if(window.feedback_type != 'LM') {
+						if(window.feedback_type != 'all' && window.feedback_type != 'LM') {
 							$('#gameBoard_LM').hide();
 						}
-						if(window.feedback_type != 'FH') {
+						if(window.feedback_type != 'all' && window.feedback_type != 'FH') {
 							$('#gameBoard_FH').hide();
 						}           
 

@@ -284,7 +284,11 @@ function logMessageAndDie($msg) {
 
 function db_connect() {
 	try {
-		$db = new PDO('mysql:host=localhost;dbname=flipIt;', DB_USERNAME, DB_PASSWORD );
+		$dbname = 'flipIt';
+		if(defined('DEMO')) {
+			$dbname = 'flipIt_demo';
+		}
+		$db = new PDO("mysql:host=localhost;dbname=$dbname;", DB_USERNAME, DB_PASSWORD );
 		$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 	catch(PDOException $e) {

@@ -101,7 +101,7 @@ function FlipItRenderEngine( renderSettings ) {
 
         if ( tick <= this.revealed ) { // Don't draw circles if hidden by fog of war.
           if ( flips[tick] == "Y" ) drawCircle( context, yColor, circleSize, x, h/4); 
-          if ( flips[tick] == "X" ) drawCircle( context, xColor, circleSize,  x, 3*h/4); 
+          if ( flips[tick] == "X" ) drawCircle( context, xColor, circleSize,  x,  3*h/4); 
         } 
 
         if ( flips[tick] != control ) { // Control has been changed.
@@ -194,7 +194,11 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 	this.update = function(xScore, yScore) { 
 		output = "";
 
-		if(window.feedback_type == 'FH') {
+		msg = "<h2 style='display:inline'>The game is now running.</h2>";
+		if(!window.game.running) msg='';
+		output += '<div id="countdown" style="text-align:left;min-height:50px;height:auto !important; height:50px;" >'+msg+'</div>';                              
+
+		if(window.feedback_type == 'all' || window.feedback_type == 'FH') {
 			output += "<b><font color="+xColor+">Blue:</font></b> "+xScore;
 			output += " ";
 			output += "<b><font color="+yColor+">Red:</font></b> "+yScore;
@@ -202,18 +206,10 @@ function ScoreBoard( scoreBoardElement, xColor, yColor ) {
 			output += "<b><font color='black'>&nbsp;&nbsp;&nbsp;&nbsp;Difference:</font></b> "+ (xScore - yScore);
 			output += "</br>";
 		}
-		else if(window.feedback_type == 'LM') {
+		if(window.feedback_type == 'all' || window.feedback_type == 'LM') {
 			output += "<div style='text-align:left;width:500px;margin-left:auto;margin-right:auto'>";
 
-			msg = "<h2 style='display:inline'>The game is now running.</h2>";
-			if(!window.game.running) msg='';
-			output += '<div id="countdown" style="min-height:100px;height:auto !important; height:100px;" >'+msg+'</div>';
-
-			//if(window.game.running) {
-				//output += getTimeElapsed();
-
-				drawLMGame(xColor, yColor);
-			//}
+			drawLMGame(xColor, yColor);
 
 			output += "</div>"; 
 		}
