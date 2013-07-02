@@ -130,6 +130,10 @@
 
 		$visual_treatment_id = $visual_treatment['id'];
 		$visual_treatment_feedback_type = $visual_treatment['feedback_type'];
+
+		if(array_key_exists('feedback', $_GET)) {
+			$visual_treatment_feedback_type = $_GET['feedback'];
+		}                      
 			
 		if(!$valid_session) {
 			$db = db_connect();
@@ -252,6 +256,9 @@
 			var game = new FlipItGame( gDraw, Players["humanPlayer"], Players["periodicPlayer"], sb.update );
 			window.game = game;
 
+			if(window.feedback_type != 'LM') {
+				$('#gameBoard_LM').hide();
+			}
 			if(window.feedback_type != 'FH') {
 				$('#gameBoard_FH').hide();
 			}          
@@ -348,6 +355,9 @@
 
 						$('#flash').css('visibility', 'hidden');
 
+						if(window.feedback_type != 'LM') {
+							$('#gameBoard_LM').hide();
+						}
 						if(window.feedback_type != 'FH') {
 							$('#gameBoard_FH').hide();
 						}           
