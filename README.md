@@ -1,3 +1,10 @@
+Forked from https://github.com/EthanHeilman/flipIt, this project has been modified to use a database, include a survey, and generally run as an experiment. The instructions and information below apply to the javascript/html-only version of the game and are not guaranteed to work with this implementation.
+
+-Alan
+
+--------------------------------------------
+
+
 flipIt - The Game of Stealthy Takeover
 ======
 
