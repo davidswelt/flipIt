@@ -1,0 +1,22 @@
+<h3><u><span style="font-family: 'Times New Roman'; font-size: medium; font-weight: normal;">Study on economic decision-making</span></u></h3>
+
+<div class="highlight-box">
+<p>Please accept the task and then visit the following link. You will read and accept a consent form, complete a survey, read the rules to a game, and play a number of rounds of the game. You will be paid a bonus in each round according to your performance in that round. You will be paid the amount on this HIT for filling out the survey completing all rounds of the game. You may not complete this HIT if you have completed one with the same title before.</p>
+
+<p>&nbsp;</p>
+<script>
+var hit_id = turkGetParam('hitId','2');
+document.write('<h3><a target="_blank" href="http://www.alannochenson.com/flipIt?hit_id='+hit_id+'"><u>Task Link</u></a></h3>');
+</script></div>
+
+<p><br />
+Please enter any comments about the task that you have, including any errors and typos that you may have found.</p>
+
+<p><textarea cols="80" name="comment" rows="3"></textarea></p>
+
+<p>
+<style type="text/css"><!--
+.highlight-box { border:solid 0px #98BE10; background:#FCF9CE; color:#222222; padding:4px; text-align:left; font-size: smaller;}
+-->
+</style>
+</p>
