@@ -2,6 +2,8 @@
 date_default_timezone_set('America/New_York');
 $date = date('m-d-Y', time());
 
+require_once(dirname(__FILE__).'/config/config.php');
+
 header("Content-type: text/csv");
 header("Content-Disposition: attachment; filename=data$date.csv");
 header("Pragma: no-cache");
@@ -14,11 +16,12 @@ function init() {
 
 function db_connect() {
 	try {
-		$db = new PDO('mysql:host=localhost;dbname=flipIt;', 'bn_wordpress', 'abdb7b5cd0');
+                $dbn = 'mysql:host=localhost;dbname=' . DB_NAME;
+                $db = new PDO($dbn . ';', DB_USERNAME, DB_PASSWORD);
 		$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 	catch(PDOException $e) {
-   	print $e->getMessage();
+          	print $e->getMessage();
 	}
 	return $db;
 }
