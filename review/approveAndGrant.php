@@ -12,6 +12,8 @@ $bonus_file = 'outfile.csv';
 $record_file = 'affected.csv';
 $realrun_file ='realrun.txt';
 
+include_once(dirname(__FILE__).'/config/config.php');
+
 $dry = 1-intval(@file_get_contents($realrun_file));
 
 $previously_affected = file_get_contents($record_file);
