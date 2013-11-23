@@ -15,6 +15,12 @@
 
 	rejectIfRepeat();
 
+	if(array_key_exists('mturk_id', $_REQUEST)) {
+		$mturk_id = $_REQUEST['mturk_id'];
+		$mturk_id = preg_replace('/[^a-zA-Z0-9]/','', $mturk_id);
+		setcookie('mturk_id', $mturk_id);
+	}      
+
 	if(array_key_exists('hit_id', $_REQUEST)) {
 		$hit_id = $_REQUEST['hit_id'];
 		$hit_id = preg_replace('/[^a-zA-Z0-9 ]/','', $hit_id);
@@ -72,7 +78,7 @@
 		unset($_REQUEST['prevPage']);
           
 		sanitizeParams(array('mturk_id','forceNewSession', 'prevPage','action', 'hit_id'));
-      integrityCheck();
+		integrityCheck();
 
 		collapseScale('rps', 9);
 		collapseScale('nfc', 9);
