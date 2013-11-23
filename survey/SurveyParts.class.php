@@ -11,10 +11,13 @@ class SurveyParts {
 		 'check1' => array('label' => 'Please select the left option.', 'type' => 'likert', 'size' => '5')
 
 		));
+		if(array_key_exists('mturk_id', $_REQUEST)) {
+                  $prop_mturk_id = $_REQUEST['mturk_id'];
+		}
 		$demoPre = 'Please answer the following demographic questions.';
 		$demo = array('pre' => $demoPre, 'title' => 'Survey',
 		'data' => array(
-			'mturk_id' => array('label' => "What is your Mechanical Turk ID?"),
+				'mturk_id' => array('label' => "What is your Mechanical Turk ID?", 'value' => $prop_mturk_id),
 			'hit_id' => array('label' => 'Which HIT did you accept to get here?', 'type'=>'hidden'),
 			'age' => array('label' => 'What is your age (in years)?'),
 			'gender' => array('type' => 'radio', 'options' => array('Male', 'Female', 'Decline to answer')),
