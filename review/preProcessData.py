@@ -25,7 +25,7 @@ def main():
     round_nums = {}
 
 
-    newcolnames = ['age', 'country', 'education', 'gender', 'mturk_id', 'nfctotal', 'rpstotal', 'round_payment', 'player_flips', 'round_score', 'round_other_score', 'round_num_flips', 'round_optimal_num_flips', ' round_num_good_flips', 'round_num_too_early_flips', 'round_num_unneeded_flips', 'round_num']
+    newcolnames = ['unknown', 'age', 'country', 'education', 'gender', 'mturk_id', 'nfctotal', 'rpstotal', 'round_payment', 'player_flips', 'round_score', 'round_other_score', 'round_num_flips', 'round_optimal_num_flips', ' round_num_good_flips', 'round_num_too_early_flips', 'round_num_unneeded_flips', 'round_num']
     for row in reader:
         for j in range(0,len(row)):
             row[j] = htmlParser.unescape(row[j])
