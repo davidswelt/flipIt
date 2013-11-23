@@ -19,6 +19,7 @@ define('COOKIE_NUM', 1);
 //Currently set at 1/100 of a cent, or 100 points = 1 cent
 define('POINTS_EXCHANGE_RATE', '0.0001');  
 
+define('DB_NAME','flipIt');
 define('DB_USERNAME','sample');
 define('DB_PASSWORD','pass');
 
