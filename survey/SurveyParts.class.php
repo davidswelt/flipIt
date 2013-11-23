@@ -11,9 +11,10 @@ class SurveyParts {
 		 'check1' => array('label' => 'Please select the left option.', 'type' => 'likert', 'size' => '5')
 
 		));
-		if(array_key_exists('mturk_id', $_REQUEST)) {
-                  $prop_mturk_id = $_REQUEST['mturk_id'];
-		}
+		$prop_mturk_id = '';
+                if(array_key_exists('mturk_id', $_COOKIE)) {
+                  $prop_mturk_id = $_COOKIE['mturk_id'];
+                }
 		$demoPre = 'Please answer the following demographic questions.';
 		$demo = array('pre' => $demoPre, 'title' => 'Survey',
 		'data' => array(
