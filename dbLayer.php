@@ -53,15 +53,16 @@ function getMTurkIdFromDb($db, $session_id) {
 	$q = "SELECT mturk_id FROM gameSession WHERE gameSession.id = $session_id";
 
 	$data = runQuery($db, $q);
-   $mturk_id = $data[0]['mturk_id'];
+	$mturk_id = $data[0]['mturk_id'];
 
 	return $mturk_id;
 }
 
 function getMTurkIdFromBlob($blob) {
 	$blob = json_decode($blob, true);
-
-	return $blob['mturk_id'];
+	$id = $blob['mturk_id'];
+	$id = preg_replace('/[^a-zA-Z0-9]/','', $id);
+	return $id;
 }
 
 function getNewTreatment($db, $treatment_type, $balanced = true) {
