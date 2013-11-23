@@ -478,18 +478,18 @@
 		}
 
 		function handleSessionEnd(bonus) {
-			var msg = '<div style="border-style:solid;background-color:grey;position:absolute;left:20px;top:300px;z-index:100"><h1 style="text-align:center;margin: 50px 50px 50px 50px">Thank you for finishing all rounds.'; 
-			
-			var paystring = 'Your performance did not warrant any bonus payments.';
-			
-			if(bonus && bonus != '$0.00') {
-				paystring = 'You will be paid an additional '+bonus+' based on your performance.';
-			}
-			msg += ' '+paystring;
-			
-			msg += ' You will be paid the amount specified in the HIT that you accepted. Please copy this message for your records and close the window.</h1></div>';
+		        var msg = '<div style="border-style:solid;background-color:grey;position:absolute;left:20px;top:300px;z-index:100"><h1 style="text-align:center;margin: 50px 50px 50px 50px">Thank you for finishing all rounds. Your participation has been recorded (no receipt code is necessary).  You will be paid the amount specified in the accepted HIT,';
 
-         elem = '<div style="z-index:0;position:absolute;left:-100px;top:-100px;width:10000px;height:10000px;background-color:gray;opacity:0.8;filter:alpha(opacity=80);"></div>';
+                        var paystring = 'but your performance did not warrant any bonus payments.';
+
+                        if(bonus && bonus != '$0.00') {
+                                paystring = ', and we\'ll send you an additional '+bonus+' based on your performance.';
+                        }
+                        msg += ' '+paystring;
+
+                        msg += ' You may copy message for your records and close the window.</h1></div>';
+
+			elem = '<div style="z-index:0;position:absolute;left:-100px;top:-100px;width:10000px;height:10000px;background-color:gray;opacity:0.8;filter:alpha(opacity=80);"></div>';
 			$('body').css('z-index', '-100');
 
 			$('body').prepend($(msg));
