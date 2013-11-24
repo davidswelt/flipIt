@@ -143,7 +143,8 @@ function getRunId($db, $session_id) {
 
 function sanitizeParams($allInts = false) {
 	$ints = array('session_id', 'run_id', 'tick', 'anchor'); 
-   $alphanums = array('mturk_id', 'action');
+	$alphanums = array('action', 'mturk_id');
+	$capitals = array('mturk_id');
 
 	foreach($_REQUEST as $k=>$v) {
    	$_REQUEST[$k] = htmlentities($v, ENT_QUOTES);
@@ -164,7 +165,10 @@ function sanitizeParams($allInts = false) {
 		}
 
 		if(in_array($k, $alphanums)) {
-			$REQUEST[$k] = preg_replace('/[^a-zA-Z0-9 \s]/','', $_REQUEST[$k]);
+			$_REQUEST[$k] = preg_replace('/[^a-zA-Z0-9]/','', $_REQUEST[$k]);
+		}
+		if(in_array($k, $capitals)) {
+		  $_REQUEST[$k] = strtoupper($_REQUEST[$k]);
 		}
 	}
 }
